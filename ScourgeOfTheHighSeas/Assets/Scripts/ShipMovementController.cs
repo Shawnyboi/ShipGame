@@ -12,24 +12,27 @@ public class ShipMovementController : MonoBehaviour {
 
 	//These variables are necessary to move the ship
 	public Vector3 m_CurrentDestination;
-	public float m_ShipSpeed;
-	public float m_ShipTurningSpeed;
+	private float m_ShipSpeed;
+	private float m_ShipTurningSpeed;
 	private Rigidbody m_Rigidbody;
 	public bool m_StandingGround;
 
 	//these variables concern some ui the ship displays
 	public Canvas m_SelectionCanvas;
 	public GameObject m_Waypoint;
-	private bool m_IsSelected;
+	public bool m_IsSelected;
 
 	//these variables pertain to the stun blocking function
-	public float m_StunBlockTime;
+	private float m_StunBlockTime;
 	private bool m_IsStunBlocked;
 
 	//this is a flag to prevent the turning coroutine from stacking
 	private bool m_IsTurning;
 
 	void Awake(){
+		m_ShipSpeed = gameObject.GetComponent<ShipAttributes>().m_Speed;
+		m_ShipTurningSpeed = gameObject.GetComponent<ShipAttributes>().m_TurningSpeed;
+		m_StunBlockTime = gameObject.GetComponent<ShipAttributes> ().m_StunBlockTime;
 		m_Rigidbody = GetComponent<Rigidbody> ();
 		m_ShipFireController = GetComponent<ShipFireController> ();
 		m_CurrentDestination = transform.position;
@@ -67,7 +70,7 @@ public class ShipMovementController : MonoBehaviour {
 	//Can only move if turned in the right direction
 	private void Move () {
 		m_Rigidbody.MovePosition(transform.position + transform.forward * m_ShipSpeed * Time.deltaTime);
-		if (Vector3.Magnitude (m_CurrentDestination - transform.position) <= 6f) {
+		if (Vector3.Magnitude (m_CurrentDestination - transform.position) <= 6f) {// 6f is a magic number to let us know we are there
 			SetCommandedDestinationFlag (false); //reached destination
 		}
 	}
@@ -127,10 +130,22 @@ public class ShipMovementController : MonoBehaviour {
 
 	}
 
-	//Do something when the ship is selected by the player
-	public void Select(){
-		m_SelectionCanvas.enabled = true;
-		m_IsSelected = true;
+	/// <summary>
+	/// This performs various things when the ship is selected (light up selection canvas and set selected flag to true)
+	/// returns false and does nothing else if object was already selected
+	/// </summary>
+	public bool Select(){
+		
+		if (!m_IsSelected) {
+			
+			m_SelectionCanvas.enabled = true;
+			m_IsSelected = true;
+			return true;
+
+		}
+
+		return false;
+
 	}
 
 	//Do something when the ship is deselected by the player
@@ -222,7 +237,7 @@ public class ShipMovementController : MonoBehaviour {
 			SetDestination (m_ShipFireController.GetTargetPosition ());
 			m_CurrentlyTrackingTarget = true;
 
-			while (m_ShipFireController.CurrentlyHasTarget () && !this.m_HaveCommandedDestination && gameObject.activeSelf == true) {
+			while (m_ShipFireController.CurrentlyHasTarget () && !this.m_HaveCommandedDestination && gameObject.activeSelf == true ) {
 
 				if (!m_ShipFireController.TargetWithinRange ()) { //if we have a target and no commanded destination we want to automatically move toward the target
 					SetDestination (m_ShipFireController.GetTargetPosition ());
@@ -259,7 +274,7 @@ public class ShipMovementController : MonoBehaviour {
 
 		if (!m_CurrentlyTrackingTarget) {
 			m_CurrentlyTrackingTarget = true;
-			while (m_ShipFireController.CurrentlyHasTarget () && !this.m_HaveCommandedDestination && gameObject.activeSelf == true) {//if target or this become null end tracking. also end it if this object gets a move command
+			while (m_ShipFireController.CurrentlyHasTarget () && !this.m_HaveCommandedDestination && gameObject.activeSelf == true && m_ShipFireController.TargetWithinRange()) {//if target or this become null end tracking. also end it if this object gets a move command
 				
 				if (Mathf.Abs (m_ShipFireController.GetAttackAngle ()) > 1f) {//if attack angle is not approximately zero 1f is a magic number about equal to zero
 
@@ -271,6 +286,7 @@ public class ShipMovementController : MonoBehaviour {
 				yield return null;
 			}
 			yield return null;
+			m_ShipFireController.SetTargetToNull (); // set target to null when it goes out of range
 			m_CurrentlyTrackingTarget = false;//set this flag false when exiting coroutine
 		} else {
 			yield return null;//if already tracking go throught this CR without doing anything

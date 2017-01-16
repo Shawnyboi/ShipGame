@@ -14,7 +14,8 @@ public class ShipColliderController : MonoBehaviour {
 
 	//Called whenever a collider enters a trigger collider
 	void OnTriggerEnter(Collider otherCollider){
-		if(otherCollider.gameObject.layer == LayerMask.NameToLayer("PlayerShips") || otherCollider.gameObject.layer == LayerMask.NameToLayer("ComShips")){
+		if((otherCollider.gameObject.layer == LayerMask.NameToLayer("PlayerShips") || otherCollider.gameObject.layer == LayerMask.NameToLayer("ComShips"))
+			&& otherCollider.gameObject.layer != this.gameObject.layer){
 			Debug.Log("StunBlocked!");
 			StartCoroutine (otherCollider.gameObject.GetComponent<ShipMovementController>().StunBlock(otherCollider));
 

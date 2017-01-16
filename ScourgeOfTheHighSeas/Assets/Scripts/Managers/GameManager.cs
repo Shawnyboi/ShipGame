@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour {
 
 
 	void Awake (){
-		DontDestroyOnLoad (gameObject);
+		DontDestroyOnLoad (gameObject);// we won't the game manager to stay around all the time
 
 	}
 	// Use this for initialization

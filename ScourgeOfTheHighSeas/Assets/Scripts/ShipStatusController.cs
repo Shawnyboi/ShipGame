@@ -9,10 +9,10 @@ public class ShipStatusController : MonoBehaviour {
 	public Slider m_Lifebar;
 	public Canvas m_BlockedCanvas;
 	public Text m_BlockedLabel;
-	public float m_MaxHullStrength;
 	public Vector3 m_VerticalHealthBarDisplacement;
 	public Vector3 m_VerticalLabelDisplacement;
 
+	private float m_MaxHullStrength;
 	private float m_CurrentHullStrength;
 	private RectTransform m_LifebarTransform;
 	private RectTransform m_BlockedLabelTransform;
@@ -39,6 +39,7 @@ public class ShipStatusController : MonoBehaviour {
 		m_LifebarCanvas.worldCamera = Camera.main;
 		m_BlockedCanvas.worldCamera = Camera.main;
 
+		m_MaxHullStrength = gameObject.GetComponent<ShipAttributes> ().m_MaxHullStrength;
 		m_CurrentHullStrength = m_MaxHullStrength;
 		m_Lifebar.maxValue = m_MaxHullStrength;
 		m_Lifebar.value = m_CurrentHullStrength;
@@ -84,12 +85,17 @@ public class ShipStatusController : MonoBehaviour {
 	//Call this function when the ship runs out of HullStrength
 	public IEnumerator Die(){
 		if (!m_IsDying) {
+			
 			m_IsDying = true;
 			m_DeathSound.Play ();
-			m_LevelManager.ShipDestroyed (m_PlayerTeam);
 			yield return new WaitForSeconds (m_DeathTime);
 			gameObject.SetActive (false);
+			gameObject.GetComponent<ShipMovementController> ().m_Waypoint.SetActive (false);
+			m_LevelManager.ShipDestroyed (m_PlayerTeam);
+
+
 		}
+
 		yield return null;
 	}
 }
