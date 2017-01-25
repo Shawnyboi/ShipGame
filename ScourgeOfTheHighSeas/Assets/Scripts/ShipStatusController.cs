@@ -40,7 +40,7 @@ public class ShipStatusController : MonoBehaviour {
 		m_BlockedCanvas.worldCamera = Camera.main;
 
 		m_MaxHullStrength = gameObject.GetComponent<ShipAttributes> ().m_MaxHullStrength;
-		m_CurrentHullStrength = m_MaxHullStrength;
+		m_CurrentHullStrength = gameObject.GetComponent<ShipAttributes>().m_CurrentHullStrength;
 		m_Lifebar.maxValue = m_MaxHullStrength;
 		m_Lifebar.value = m_CurrentHullStrength;
 		m_LifebarTransform = m_Lifebar.GetComponent<RectTransform> ();

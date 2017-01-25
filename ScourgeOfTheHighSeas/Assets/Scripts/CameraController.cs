@@ -5,11 +5,12 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 
 	public Camera m_MainCamera;
+	private Transform m_MainCameraTransform;
 	public float m_CameraSpeed;
 	public bool m_MouseEnabled;
 
 	void Awake(){
-
+		m_MainCameraTransform = m_MainCamera.gameObject.GetComponent<Transform> ();
 	}
 
 
@@ -38,14 +39,14 @@ public class CameraController : MonoBehaviour {
 
 	//Move the camera as calculated by CalculateCameraMovement
 	private void MoveCamera(Vector3 deltaMovement){
-		m_MainCamera.transform.position = m_MainCamera.transform.position + deltaMovement;
+		m_MainCameraTransform.position = m_MainCameraTransform.position + deltaMovement;
 	}
 
 
 	//Calculate how the camera should be moved from the given input
 	private Vector3 CalculateCameraMovement(Vector3 inputVector){
 
-		Vector3 rotatedInput = Quaternion.Euler (0, m_MainCamera.transform.eulerAngles.y, 0) * inputVector; //The input must be rotated to account for the direction the camera is facing
+		Vector3 rotatedInput = Quaternion.Euler (0, m_MainCameraTransform.eulerAngles.y, 0) * inputVector; //The input must be rotated to account for the direction the camera is facing
 		return rotatedInput * m_CameraSpeed * Time.unscaledDeltaTime; //then we multiply by the camera's scroll speed
 
 	}

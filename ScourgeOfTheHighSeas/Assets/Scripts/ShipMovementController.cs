@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 //this class mostly controls information pertaining to the movement of the ship
 public class ShipMovementController : MonoBehaviour {
@@ -22,6 +23,9 @@ public class ShipMovementController : MonoBehaviour {
 	public GameObject m_Waypoint;
 	public bool m_IsSelected;
 
+	//this 
+	private List<Vector3> m_SubWaypointList;
+
 	//these variables pertain to the stun blocking function
 	private float m_StunBlockTime;
 	private bool m_IsStunBlocked;
@@ -29,13 +33,17 @@ public class ShipMovementController : MonoBehaviour {
 	//this is a flag to prevent the turning coroutine from stacking
 	private bool m_IsTurning;
 
+	//caching the transform limits necesarry overhead b/c calling gameObject.transform is costly
+	private Transform m_Transform;
+
 	void Awake(){
+		m_Transform = gameObject.GetComponent<Transform> ();
 		m_ShipSpeed = gameObject.GetComponent<ShipAttributes>().m_Speed;
 		m_ShipTurningSpeed = gameObject.GetComponent<ShipAttributes>().m_TurningSpeed;
 		m_StunBlockTime = gameObject.GetComponent<ShipAttributes> ().m_StunBlockTime;
 		m_Rigidbody = GetComponent<Rigidbody> ();
 		m_ShipFireController = GetComponent<ShipFireController> ();
-		m_CurrentDestination = transform.position;
+		m_CurrentDestination = m_Transform.position;
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
 		m_IsStunBlocked = false;
@@ -58,7 +66,7 @@ public class ShipMovementController : MonoBehaviour {
 	void FixedUpdate () {
 
 		if (!m_IsStunBlocked) {
-			if (Vector3.Magnitude (m_CurrentDestination - transform.position) > 5f) { //if not at destination (5 is a magic number)
+			if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5f) { //if not at destination (5 is a magic number)
 				Move ();
 
 			}
@@ -69,16 +77,16 @@ public class ShipMovementController : MonoBehaviour {
 	//Then check if you are close enough to the destination, if so set given destination flag to false
 	//Can only move if turned in the right direction
 	private void Move () {
-		m_Rigidbody.MovePosition(transform.position + transform.forward * m_ShipSpeed * Time.deltaTime);
-		if (Vector3.Magnitude (m_CurrentDestination - transform.position) <= 6f) {// 6f is a magic number to let us know we are there
+		m_Rigidbody.MovePosition(m_Transform.position + m_Transform.forward * m_ShipSpeed * Time.deltaTime);
+		if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) <= 6f) {// 6f is a magic number to let us know we are there
 			SetCommandedDestinationFlag (false); //reached destination
 		}
 	}
 
 	//Turn the bow of the ship toward the destination
 	private void Turn () {	
-		float angleToDest = Vector3.Angle (transform.forward, m_CurrentDestination - transform.position);
-		Vector3 crossProduct = Vector3.Cross (transform.forward, m_CurrentDestination - transform.position);
+		float angleToDest = Vector3.Angle (m_Transform.forward, m_CurrentDestination - m_Transform.position);
+		Vector3 crossProduct = Vector3.Cross (m_Transform.forward, m_CurrentDestination - m_Transform.position);
 		Quaternion deltaRotation;
 		if (crossProduct.y < 0f) {
 			deltaRotation = Quaternion.Euler (0f, -Time.smoothDeltaTime * m_ShipTurningSpeed, 0f); //turn to port
@@ -160,7 +168,7 @@ public class ShipMovementController : MonoBehaviour {
 		if (blockerCollider == this.gameObject.GetComponent<ShipColliderController> ().m_TriggerCollider) {
 			m_IsStunBlocked = true;
 			this.gameObject.GetComponent<ShipStatusController> ().SetStunBlockStatus (true);
-			m_CurrentDestination = transform.position;		
+			m_CurrentDestination = m_Transform.position;		
 			yield return new WaitForSeconds (m_StunBlockTime);
 			m_IsStunBlocked = false;
 			this.gameObject.GetComponent<ShipStatusController> ().SetStunBlockStatus (false);
@@ -172,7 +180,7 @@ public class ShipMovementController : MonoBehaviour {
 	/// This coroutine will handle the turning concurrently to the movement in order to make it look smoother
 	/// </summary>
 	private IEnumerator HandleTurning(){
-		while (Vector3.Magnitude (m_CurrentDestination - transform.position) > 5) {
+		while (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5) {
 			m_IsTurning = true;		
 			Turn ();
 			yield return null;
@@ -198,7 +206,7 @@ public class ShipMovementController : MonoBehaviour {
 	/// </summary>
 	private IEnumerator RenderWaypoint (){
 		m_Waypoint.transform.position = m_CurrentDestination;
-		while (Vector3.Magnitude (m_CurrentDestination - transform.position) > 5) {
+		while (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5) {
 			if (m_IsSelected) {
 				m_Waypoint.SetActive (true);
 			} else {
@@ -244,7 +252,7 @@ public class ShipMovementController : MonoBehaviour {
 					yield return null;
 
 				} else { //if already in range, stop moving and turn to attack
-					SetDestination (gameObject.transform.position);
+					SetDestination (m_Transform.position);
 
 					if (Mathf.Abs(m_ShipFireController.GetAttackAngle ()) > 1f) {//if attack angle is not approximately zero 1f is a magic number about equal to zero
 						

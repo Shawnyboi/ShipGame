@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour {
 		m_TeamLayerMask = 1 << LayerMask.NameToLayer ("PlayerShips");
 		m_SelectionBoxOn = false;
 		m_SelectionBoxCanvas.enabled = false;
-		m_ShipSeparation = 10f;
+		//m_ShipSeparation = 10f;
 	}
 
 	// Use this for initialization
@@ -88,15 +88,7 @@ public class PlayerController : MonoBehaviour {
 
 		if (Input.GetKeyDown("p")){
 			
-			if(!m_VirtuallyPaused){
-				
-				VirtualPause (true);
-
-			}else{
-				
-				VirtualPause (false);
-
-			}
+			VirtualPause ();
 		}
 
 		if (Input.GetKeyDown ("z")) {
@@ -422,9 +414,9 @@ public class PlayerController : MonoBehaviour {
 	/// Pauses so that the game objects do not move around but commands can stll be given and ships still be selected
 	/// </summary>
 	/// <param name="pausing">If set to <c>true</c> pause.</param>
-	private void VirtualPause(bool pausing){
-		
-		if (pausing) {
+	public void VirtualPause(){
+		Debug.Log ("Calling virtual pause in player controller");
+		if (m_VirtuallyPaused == false) {
 			
 			m_VirtuallyPaused = true;
 			Time.timeScale *= m_VirtualPauseTimeScaleFactor;

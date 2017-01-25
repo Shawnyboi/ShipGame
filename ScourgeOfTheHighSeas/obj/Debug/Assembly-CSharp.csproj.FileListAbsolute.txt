@@ -19,3 +19,11 @@ C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.U
 C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.Networking.xml
 C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\obj\Debug\Assembly-CSharp.dll
 C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\obj\Debug\Assembly-CSharp.pdb
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.Analytics.dll
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.HoloLens.dll
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.PlaymodeTestsRunner.dll
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.VR.dll
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.PlaymodeTestsRunner.xml
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.Analytics.xml
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.HoloLens.xml
+C:\Users\shawn\Documents\Unity\ScourgeOfTheHighSeas\Temp\bin\Debug\UnityEngine.VR.xml

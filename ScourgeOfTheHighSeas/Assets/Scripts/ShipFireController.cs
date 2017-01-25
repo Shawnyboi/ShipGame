@@ -8,21 +8,24 @@ public class ShipFireController : MonoBehaviour {
 	public Transform[] m_StarboardFirePositions;
 
 	public GameObject m_Cannonball;
-	private float m_Range;
-	private float m_Damage;
-	private float m_ReloadTime;
-	private float m_LaunchSpeed;
-	private float m_PercentAccuracy;
-	private float m_ShotVarianceDegrees;
+	protected float m_Range;
+	protected float m_Damage;
+	protected float m_ReloadTime;
+	protected float m_LaunchSpeed;
+	protected float m_PercentAccuracy;
+	protected float m_ShotVarianceDegrees;
 	public AudioSource m_CannonFireSound;
 
-	private GameObject m_Target;
-	private bool m_Attacking;
+	protected GameObject m_Target;
+	protected bool m_Attacking;
 
-	private string m_Disposition;
-	private LayerMask m_EnemyTeamMask;
+	protected string m_Disposition;
+	protected LayerMask m_EnemyTeamMask;
+
+	protected Transform m_Transform;
 
 	void Awake(){
+		m_Transform = gameObject.GetComponent<Transform> ();
 		m_ShotVarianceDegrees = gameObject.GetComponent<ShipAttributes> ().m_ShotVarianceDegrees;
 		m_PercentAccuracy = gameObject.GetComponent<ShipAttributes>().m_PercentAccuracy;
 		m_Range = gameObject.GetComponent<ShipAttributes> ().m_Range;
@@ -94,11 +97,11 @@ public class ShipFireController : MonoBehaviour {
 	/// This function which is caled in update if the ship has no target detects if there is 
 	/// an enemy within range and then acts based on the current disposition of this ship (Aggressive, Defensive, Peaceful)
 	/// </summary>
-	private void ScanForEnemy(){
+	protected void ScanForEnemy(){
 		if (m_Disposition != "peaceful") {
 			if (m_Target == null) {
 				
-				Collider[] enemyCollidersInRange = Physics.OverlapSphere (this.gameObject.transform.position, m_Range, m_EnemyTeamMask); //Detect all enemy ships' colliders within range
+				Collider[] enemyCollidersInRange = Physics.OverlapSphere (m_Transform.position, m_Range, m_EnemyTeamMask); //Detect all enemy ships' colliders within range
 
 				if(enemyCollidersInRange.Length > 0){
 					
@@ -124,7 +127,7 @@ public class ShipFireController : MonoBehaviour {
 
 	//Fire the cannonball toawrd target position
 	//returns true if cannon fired
-	private bool Fire(Vector3 targetPosition){
+	protected virtual bool Fire(Vector3 targetPosition){
 
 		string targetPositionOrientation = DetermineTargetOrientation (targetPosition);
 		Vector3 firePosition;
@@ -158,27 +161,35 @@ public class ShipFireController : MonoBehaviour {
 		}
 
 		//fire the cannonball
-		if(Vector3.Distance(gameObject.transform.position, targetPosition) < m_Range){
+		if(Vector3.Distance(m_Transform.position, targetPosition) < m_Range){
 			
 			if (!m_Cannonball.GetComponent<CannonballController> ().m_IsAlive) {
-				
-				m_Cannonball.SetActive (true);
-				m_Cannonball.transform.position = firePosition;
-				m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
-				StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
-				Vector3 trajectory = CalculateTrajectory (targetPosition, firePosition);
-				trajectory = VariateTrajectory (trajectory);
-				m_CannonFireSound.Play ();
-				m_Cannonball.GetComponent<Rigidbody> ().velocity = m_LaunchSpeed * trajectory;
+
+				LaunchCannonball (firePosition, targetPosition);
 
 				return true;
 			}
 			return false; //Target not within range
 		}
 		return false; //Cannonball already fired and isn't gone yet
+	}
 
+	/// <summary>
+	/// Call this function to take care of everything that comes with firing the cannonball
+	/// </summary>
+	/// <param name="firePosition">Fire position.</param>
+	/// <param name="targetPosition">Target position.</param>
+	protected virtual void LaunchCannonball(Vector3 firePosition, Vector3 targetPosition){
 
-		
+		m_Cannonball.SetActive (true);
+		m_Cannonball.transform.position = firePosition;
+		m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
+		m_Cannonball.GetComponent<CannonballController> ().SetTeamLayer (this.gameObject.layer);
+		StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
+		Vector3 trajectory = CalculateTrajectory (targetPosition, firePosition);
+		trajectory = VariateTrajectory (trajectory);
+		m_CannonFireSound.Play ();
+		m_Cannonball.GetComponent<Rigidbody> ().velocity = m_LaunchSpeed * trajectory;
 
 	}
 
@@ -186,11 +197,11 @@ public class ShipFireController : MonoBehaviour {
 	//It uses the difference of the forward angle and the position of the target relative to te ship
 	//there are 4 sides, the bow, the stern, the port, and the starboard each occupying 90 degree arcs around
 	//the four cardinal directions relative to the ship
-	private string DetermineTargetOrientation(Vector3 targetPosition){
+	protected string DetermineTargetOrientation(Vector3 targetPosition){
 
 		float signedAngle;
-		float unsignedAngle = Vector3.Angle (gameObject.transform.forward, targetPosition - gameObject.transform.position);
-		Vector3 crossProduct = Vector3.Cross (gameObject.transform.forward, targetPosition - gameObject.transform.position);
+		float unsignedAngle = Vector3.Angle (m_Transform.forward, targetPosition - m_Transform.position);
+		Vector3 crossProduct = Vector3.Cross (m_Transform.forward, targetPosition - m_Transform.position);
 
 		if (crossProduct.y > 0) {
 			
@@ -227,7 +238,7 @@ public class ShipFireController : MonoBehaviour {
 
 	//This function is called to determine which direction to set the cannonball's velocity
 	//Note that since all we want is the direction the return vector is normalized
-	private Vector3 CalculateTrajectory(Vector3 targetPosition, Vector3 firePosition){
+	protected  Vector3 CalculateTrajectory(Vector3 targetPosition, Vector3 firePosition){
 		
 		Vector3 trajectory = targetPosition - firePosition;
 		trajectory.y += 1; //We raise the cannonball a little when it fire, makes it look nicer
@@ -241,7 +252,7 @@ public class ShipFireController : MonoBehaviour {
 	/// </summary>
 	/// <returns>The variated trajectory.</returns>
 	/// <param name="originalTrajectory">Original trajectory.</param>
-	private Vector3 VariateTrajectory(Vector3 originalTrajectory){
+	protected Vector3 VariateTrajectory(Vector3 originalTrajectory){
 		if (Random.Range (0f, 100f) > m_PercentAccuracy) {
 			Quaternion randomRotation = Quaternion.Euler (Random.Range (-m_ShotVarianceDegrees, m_ShotVarianceDegrees), Random.Range (m_ShotVarianceDegrees, m_ShotVarianceDegrees), 0f);
 			return randomRotation * originalTrajectory;
@@ -256,7 +267,7 @@ public class ShipFireController : MonoBehaviour {
 	/// This Coroutine will take care of determining when to fire 
 	/// It also puts a delay in between shots equal to the reload time
 	/// </summary>
-	private IEnumerator Attack(){
+	protected IEnumerator Attack(){
 		
 		m_Attacking = true;
 
@@ -309,7 +320,7 @@ public class ShipFireController : MonoBehaviour {
 		
 		if (m_Target != null) {
 			
-			return (Vector3.Distance (this.gameObject.transform.position, m_Target.transform.position) < m_Range);
+			return (Vector3.Distance (this.m_Transform.position, m_Target.transform.position) < m_Range);
 
 		} else {
 			
@@ -330,7 +341,7 @@ public class ShipFireController : MonoBehaviour {
 
 		}else{
 			
-			return this.gameObject.transform.position;
+			return this.m_Transform.position;
 
 		}
 	}
@@ -338,13 +349,13 @@ public class ShipFireController : MonoBehaviour {
 	/// <summary>
 	/// returns the angle between the closest attacking side  and the target
 	/// </summary>
-	public float GetAttackAngle(){
+	public virtual float GetAttackAngle(){
 		
 		if (m_Target != null) {
 			
 			float signedAngle;
-			float unsignedAngle = Vector3.Angle (gameObject.transform.forward, m_Target.transform.position - gameObject.transform.position);
-			Vector3 crossProduct = Vector3.Cross (gameObject.transform.forward, m_Target.transform.position - gameObject.transform.position);
+			float unsignedAngle = Vector3.Angle (m_Transform.forward, m_Target.transform.position - m_Transform.position);
+			Vector3 crossProduct = Vector3.Cross (m_Transform.forward, m_Target.transform.position - m_Transform.position);
 
 			if (crossProduct.y > 0) {
 				
