@@ -46,11 +46,13 @@ public class GameManager : MonoBehaviour {
 	/// This will get called after the game manager is instantiated to set some receive certain member variable references
 	/// </summary>
 	public void InitializeGameManager(OverworldDataController overworldDataController, PlayerDataController playerDataController){
+		
 		m_OverworldDataController = overworldDataController;
 		m_PlayerDataController = playerDataController;
 		m_OverworldSceneIndex = 1;
 		m_OverworldControllerTag = "OverworldController";
 		GoToOverworld ();
+
 	}
 
 	/// <summary>
@@ -58,13 +60,21 @@ public class GameManager : MonoBehaviour {
 	/// it will also create and initialize the overworld controller
 	/// </summary>
 	private void GoToOverworld(){
+		
 		SceneManager.LoadScene (m_OverworldSceneIndex);
 		//See OnSceneFinishedLoading for additional logic that this causes
-	}
 
+	}
+	/// <summary>
+	/// Call this function to go to a certain level
+	/// This will indirectly create the level manager
+	/// </summary>
+	/// <param name="levelSceneIndex">index for the scene manager.</param>
 	private void GoToLevel(int levelSceneIndex){
+		
 		SceneManager.LoadScene (levelSceneIndex);
 		//See OnSceneFinishedLoading for additional logic that this causes
+
 	}
 
 
@@ -76,12 +86,15 @@ public class GameManager : MonoBehaviour {
 
 		GameObject[] comShips = m_OverworldDataController.GetEnemyShipsForLevel (sceneIndex);
 
-		int playerShipsToSpawn = Mathf.Min (m_CurrentLevelManager.m_PlayerShips.Length, m_PlayerDataController.m_PlayerFleet.Count);
+		int playerShipsToSpawn = Mathf.Min (m_CurrentLevelManager.m_PlayerShips.Length, m_PlayerDataController.GetFleetSize()); //determine how many player ships to take from fleet
 
-		for (int i = 0; i < playerShipsToSpawn; i++) {
+		for (int i = 0; i < playerShipsToSpawn; i++) { //loop through player fleet for the first n ships and give their prefab references to the level manager
 
-			levelManager.m_PlayerShips [i] = m_PlayerDataController.m_PlayerFleet[i]; //fill the player ships in the level manager with the first ships in the player fleet
+			levelManager.m_PlayerShips [i] = m_PlayerDataController.GetShipFromFleet(i); //fill the player ships in the level manager with the first ships in the player fleet
+			levelManager.m_PlayerShipAttributesData[i] = m_PlayerDataController.GetShipAttributesDataFromFleet(i);
 		}
+
+		m_PlayerDataController.RemoveShipsfromFleet (0, playerShipsToSpawn); //remove those ships so they can be replaced with the updated versions later
 
 		for (int i = 0; i < levelManager.m_ComShipsFirstWave.Length; i++) {
 
@@ -97,7 +110,7 @@ public class GameManager : MonoBehaviour {
 
 		for (int i = 0; i < levelManager.m_ComShipsThirdWave.Length; i++) {
 
-			levelManager.m_ComShipsThirdWave [i] = comShips [Random.Range (0, comShips .Length)]; //fill the com ship arrays with random ships
+			levelManager.m_ComShipsThirdWave [i] = comShips [Random.Range (0, comShips .Length)]; //fill the com ship arrays with random ships from the array given by the OwDC
 
 		}
 	}
@@ -110,8 +123,9 @@ public class GameManager : MonoBehaviour {
 	public IEnumerator LevelLoop(){
 		
 		yield return StartCoroutine(m_CurrentLevelManager.BattleLoop());
-		List<GameObject> survivingShips = m_CurrentLevelManager.GetLivePlayerShips ();
+		LevelCleanup ();
 		GoToOverworld ();
+
 	}
 
 
@@ -121,10 +135,22 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	/// <returns>The loop.</returns>
 	public IEnumerator OverworldLoop(){
+		
 		m_CurrentOverworldController = GameObject.FindWithTag (m_OverworldControllerTag).GetComponent<OverworldController>();
 		yield return StartCoroutine (m_CurrentOverworldController.WaitForLocationSelection ());
 		GoToLevel (m_CurrentOverworldController.GetSelectedLevelSceneIndex ());
 
+	}
+
+	/// <summary>
+	/// Call this function at the end of a level to persist the player fleet and auto save
+	/// </summary>
+	private void LevelCleanup(){
+		List<GameObject> survivingShips = m_CurrentLevelManager.GetLivePlayerShips ();
+		foreach (GameObject ship in survivingShips) {
+			m_PlayerDataController.AddShipToFleet (ship);
+		}
+		m_PlayerDataController.AutoSave ();
 	}
 
 
@@ -140,6 +166,10 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	/// <summary>
+	/// It is necesarry to delay certain functions until after a scene is finsihed loading
+	/// This function is added to the delegate function called on sceneLoaded
+	/// </summary>
 	void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode){
 		
 		if (scene.buildIndex == m_OverworldSceneIndex) {//This means we went to the overworld

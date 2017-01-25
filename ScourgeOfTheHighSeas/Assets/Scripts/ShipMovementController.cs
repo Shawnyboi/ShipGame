@@ -11,6 +11,8 @@ public class ShipMovementController : MonoBehaviour {
 	private bool m_CurrentlyTrackingTarget;
 	private bool m_HaveCommandedDestination;
 
+	private ShipAttributes m_ShipAttributes;
+
 	//These variables are necessary to move the ship
 	public Vector3 m_CurrentDestination;
 	private float m_ShipSpeed;
@@ -38,9 +40,7 @@ public class ShipMovementController : MonoBehaviour {
 
 	void Awake(){
 		m_Transform = gameObject.GetComponent<Transform> ();
-		m_ShipSpeed = gameObject.GetComponent<ShipAttributes>().m_Speed;
-		m_ShipTurningSpeed = gameObject.GetComponent<ShipAttributes>().m_TurningSpeed;
-		m_StunBlockTime = gameObject.GetComponent<ShipAttributes> ().m_StunBlockTime;
+		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_Rigidbody = GetComponent<Rigidbody> ();
 		m_ShipFireController = GetComponent<ShipFireController> ();
 		m_CurrentDestination = m_Transform.position;
@@ -51,6 +51,13 @@ public class ShipMovementController : MonoBehaviour {
 		m_Waypoint.SetActive (false);
 		m_IsTurning = false;
 		m_CurrentlyTrackingTarget = false;
+
+	}
+
+	void Start(){
+		m_ShipSpeed = m_ShipAttributes.m_Speed;
+		m_ShipTurningSpeed = m_ShipAttributes.m_TurningSpeed;
+		m_StunBlockTime = m_ShipAttributes.m_StunBlockTime;
 
 	}
 

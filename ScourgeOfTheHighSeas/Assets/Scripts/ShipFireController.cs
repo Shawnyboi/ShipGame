@@ -7,6 +7,8 @@ public class ShipFireController : MonoBehaviour {
 	public Transform[] m_PortFirePositions;
 	public Transform[] m_StarboardFirePositions;
 
+	protected ShipAttributes m_ShipAttributes;
+
 	public GameObject m_Cannonball;
 	protected float m_Range;
 	protected float m_Damage;
@@ -26,12 +28,7 @@ public class ShipFireController : MonoBehaviour {
 
 	void Awake(){
 		m_Transform = gameObject.GetComponent<Transform> ();
-		m_ShotVarianceDegrees = gameObject.GetComponent<ShipAttributes> ().m_ShotVarianceDegrees;
-		m_PercentAccuracy = gameObject.GetComponent<ShipAttributes>().m_PercentAccuracy;
-		m_Range = gameObject.GetComponent<ShipAttributes> ().m_Range;
-		m_Damage = gameObject.GetComponent<ShipAttributes> ().m_Damage;
-		m_ReloadTime = gameObject.GetComponent<ShipAttributes> ().m_ReloadTime;
-		m_LaunchSpeed = gameObject.GetComponent<ShipAttributes> ().m_LaunchSpeed;
+		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_Disposition = "aggressive";
 		m_Attacking = false;
 		m_Cannonball = Instantiate (m_Cannonball);
@@ -41,6 +38,13 @@ public class ShipFireController : MonoBehaviour {
 	}
 
 	void Start(){
+
+		m_ShotVarianceDegrees = m_ShipAttributes.m_ShotVarianceDegrees;
+		m_PercentAccuracy = m_ShipAttributes.m_PercentAccuracy;
+		m_Range = m_ShipAttributes.m_Range;
+		m_Damage = m_ShipAttributes.m_Damage;
+		m_ReloadTime = m_ShipAttributes.m_ReloadTime;
+		m_LaunchSpeed = m_ShipAttributes.m_LaunchSpeed;
 		
 		if(gameObject.layer == LayerMask.NameToLayer("PlayerShips")){
 			

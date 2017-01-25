@@ -20,6 +20,7 @@ public class MainMenuController : MonoBehaviour {
 	public void StartGame (bool newGame = true){
 		
 		PlayerDataController playerDataController = Instantiate (m_PlayerDataControllerPrefab).GetComponent<PlayerDataController>();
+		playerDataController.InitializePlayerDataController (newGame, 0);
 
 		OverworldDataController overWorldDataController = Instantiate (m_OverworldDataControllerPrefab).GetComponent<OverworldDataController>();
 

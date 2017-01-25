@@ -12,6 +12,7 @@ public class ShipStatusController : MonoBehaviour {
 	public Vector3 m_VerticalHealthBarDisplacement;
 	public Vector3 m_VerticalLabelDisplacement;
 
+	private ShipAttributes m_ShipAttributes;
 	private float m_MaxHullStrength;
 	private float m_CurrentHullStrength;
 	private RectTransform m_LifebarTransform;
@@ -39,10 +40,7 @@ public class ShipStatusController : MonoBehaviour {
 		m_LifebarCanvas.worldCamera = Camera.main;
 		m_BlockedCanvas.worldCamera = Camera.main;
 
-		m_MaxHullStrength = gameObject.GetComponent<ShipAttributes> ().m_MaxHullStrength;
-		m_CurrentHullStrength = gameObject.GetComponent<ShipAttributes>().m_CurrentHullStrength;
-		m_Lifebar.maxValue = m_MaxHullStrength;
-		m_Lifebar.value = m_CurrentHullStrength;
+		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_LifebarTransform = m_Lifebar.GetComponent<RectTransform> ();
 
 		m_BlockedCanvas.enabled = false;
@@ -50,6 +48,14 @@ public class ShipStatusController : MonoBehaviour {
 
 		m_DeathSound.enabled = true;
 		m_IsDying = false;
+
+	}
+
+	void Start(){
+		m_MaxHullStrength = m_ShipAttributes.m_MaxHullStrength;
+		m_CurrentHullStrength = m_ShipAttributes.m_CurrentHullStrength;
+		m_Lifebar.maxValue = m_MaxHullStrength;
+		m_Lifebar.value = m_CurrentHullStrength;
 
 	}
 	
@@ -77,6 +83,7 @@ public class ShipStatusController : MonoBehaviour {
 	public void Damage(float amt){
 		Debug.Log ("Hit for " + amt + " Damage");
 		m_CurrentHullStrength -= amt;
+		m_ShipAttributes.m_CurrentHullStrength -= amt;
 		if (m_CurrentHullStrength <= 0) {
 			StartCoroutine(Die ());
 		}

@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour {
 
 	//There can be up to three waves of computer ships for a standard level
 	public GameObject[] m_PlayerShips;
+	public ShipAttributesData[] m_PlayerShipAttributesData;
 	public GameObject[] m_ComShipsFirstWave;
 	public GameObject[] m_ComShipsSecondWave;
 	public GameObject[] m_ComShipsThirdWave;
@@ -47,6 +48,7 @@ public class LevelManager : MonoBehaviour {
 		//The number of ships to be generated are determined by the spawn point container object which is in each level
 		m_SpawnPointContainer = GameObject.FindGameObjectWithTag ("SpawnPointContainer").GetComponent<SpawnPointContainer>();
 		m_PlayerShips = new GameObject[m_SpawnPointContainer.m_PlayerSpawnPoints.Length];
+		m_PlayerShipAttributesData = new ShipAttributesData[m_SpawnPointContainer.m_PlayerSpawnPoints.Length];
 		m_ComShipsFirstWave = new GameObject[m_SpawnPointContainer.m_ComSpawnPointsFirstWave.Length];
 		m_ComShipsSecondWave = new GameObject[m_SpawnPointContainer.m_ComSpawnPointsSecondWave.Length];
 		m_ComShipsThirdWave = new  GameObject[m_SpawnPointContainer.m_ComSpawnPointsThirdWave.Length];
@@ -66,14 +68,17 @@ public class LevelManager : MonoBehaviour {
 
 		//GameObject[] playerShips = new GameObject[m_NumberOfPlayerShips];
 
-		for (int i = 0; i < m_SpawnPointContainer.m_PlayerSpawnPoints.Length; i++) {
-			Debug.Log ("Instantiating Player ship " + i);
-			GameObject playerShip = Instantiate (m_PlayerShips [i], m_SpawnPointContainer.m_PlayerSpawnPoints [i].position, m_SpawnPointContainer.m_PlayerSpawnPoints [i].rotation) as GameObject;
-			playerShip.GetComponent<ShipStatusController>().m_PlayerTeam = true;
-			playerShip.gameObject.layer = LayerMask.NameToLayer("PlayerShips");
-			playerShip.GetComponent<ShipStatusController> ().m_LevelManager = this;
-			playerShip.name = "PlayerShip" + i;
-			m_LivePlayerShips.Add(playerShip);
+		for (int i = 0; i < m_PlayerShips.Length; i++) {
+			if (m_PlayerShips [i] != null) {
+				Debug.Log ("Instantiating Player ship " + i);
+				GameObject playerShip = Instantiate (m_PlayerShips [i], m_SpawnPointContainer.m_PlayerSpawnPoints [i].position, m_SpawnPointContainer.m_PlayerSpawnPoints [i].rotation) as GameObject;
+				playerShip.GetComponent<ShipStatusController> ().m_PlayerTeam = true;
+				playerShip.gameObject.layer = LayerMask.NameToLayer ("PlayerShips");
+				playerShip.GetComponent<ShipStatusController> ().m_LevelManager = this;
+				playerShip.GetComponent<ShipAttributes> ().CopyShipAttributesFromData (m_PlayerShipAttributesData [i]);
+				playerShip.name = "PlayerShip" + i;
+				m_LivePlayerShips.Add (playerShip);
+			}
 																																										
 		}
 
