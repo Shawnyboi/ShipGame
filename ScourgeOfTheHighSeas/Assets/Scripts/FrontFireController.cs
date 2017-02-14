@@ -51,24 +51,27 @@ public class FrontFireController : ShipFireController {
 		
 
 	override protected void LaunchCannonball(Vector3 firePosition, Vector3 targetPosition){
+		Debug.Log ("targetPosition: "+ targetPosition);
 		m_Cannonball.SetActive (true);
 		m_Cannonball.transform.position = firePosition;
 		m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
-		m_Cannonball.GetComponent<CannonballController> ().SetTeamLayer (this.gameObject.layer);
+		m_Cannonball.GetComponent<CannonballController> ().SetEnemyLayer (m_EnemyTeamMask);
 		StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
 		m_CannonFireSound.Play ();
-		m_Cannonball.GetComponent<Rigidbody> ().velocity = calculateBallisticVelocity(firePosition, targetPosition) * m_BowFirePositions[0].forward;
+		m_Cannonball.GetComponent<Rigidbody> ().velocity = calculateBallisticVelocity(firePosition, targetPosition);
 
 
 	}
 
-	private float calculateBallisticVelocity(Vector3 firePosition, Vector3 targetPosition){
-		float distance = Vector3.Distance (firePosition, targetPosition); //since we are not accounting for initial height our answer will be slightly off
-		Debug.Log("Distance = " + distance);
-		Debug.Log("angle = " +  m_BowFirePositions [0].transform.rotation.eulerAngles.x);
-		Debug.Log ("acc due to gravity " + -Physics.gravity.y);
-		Debug.Log( "velocity = " + Mathf.Sqrt (distance * (-Physics.gravity.y) / Mathf.Sin (2 * (360f - m_BowFirePositions [0].transform.rotation.eulerAngles.x))));
-		return Mathf.Sqrt (distance * (-Physics.gravity.y) / Mathf.Sin (2 * (360f - m_BowFirePositions [0].transform.rotation.eulerAngles.x)));
+	private Vector3 calculateBallisticVelocity(Vector3 firePosition, Vector3 targetPosition){
+
+		Vector3 fromFireToTarget = targetPosition - firePosition;
+		Vector3 horizontalProjection = Vector3.ProjectOnPlane(fromFireToTarget,new Vector3(0f,1f,0f));
+		float horizontalDistance = Vector3.Magnitude (horizontalProjection);
+		float timeOfFlight = horizontalDistance / m_LaunchSpeed; //this part is unrealistic but should make it look nicer, the time of flight is determined as if it was just flying straight at the launch speed
+		Vector3 horizontalVelocity = Vector3.Normalize(horizontalProjection) * m_LaunchSpeed;
+		Vector3 verticalVelocity = new Vector3 (0f, 1f, 0f) * Physics.gravity.y * timeOfFlight / 2f;
+		return horizontalVelocity - verticalVelocity;
 	}
 
 

@@ -173,7 +173,8 @@ public class GameManager : MonoBehaviour {
 	void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode){
 		
 		if (scene.buildIndex == m_OverworldSceneIndex) {//This means we went to the overworld
-			
+			m_CurrentOverworldController = GameObject.FindGameObjectWithTag(m_OverworldControllerTag).GetComponent<OverworldController>();
+			m_CurrentOverworldController.m_OverworldDataController = m_OverworldDataController;
 			StartCoroutine (OverworldLoop ());
 
 		} else {//This means we went to some other level

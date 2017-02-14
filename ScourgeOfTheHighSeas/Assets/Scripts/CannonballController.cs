@@ -11,16 +11,26 @@ public class CannonballController : MonoBehaviour {
 
 	[HideInInspector] public bool m_IsAlive;
 
-	private AudioSource m_ExplosionSound;
-	private ParticleSystem m_CollisionExplosion;
-	private float m_DamageAmount = 0f;
-	private int m_FriendlyLayer;
+	protected LayerMask m_LayerMask;
 
-	void Start(){
+
+	protected AudioSource m_ExplosionSound;
+	protected ParticleSystem m_CollisionExplosion;
+	protected float m_DamageAmount = 0f;
+	protected int m_FriendlyLayer;
+	protected int m_EnemyLayer;
+	protected LayerMask m_FriendlyLayerMask;
+	protected LayerMask m_EnemyLayerMask;
+
+	protected void Start(){
 		
 	}
 
-	private void Awake(){
+	protected void Update(){
+
+	}
+
+	virtual protected void Awake(){
 		m_CollisionExplosion = Instantiate (m_CollisionExplosionPrefab).GetComponent<ParticleSystem> ();
 		m_ExplosionSound = m_CollisionExplosion.GetComponent<AudioSource> ();
 	}
@@ -32,22 +42,28 @@ public class CannonballController : MonoBehaviour {
 			
 			if (col.gameObject.layer == LayerMask.NameToLayer ("PlayerShips") || col.gameObject.layer == LayerMask.NameToLayer ("ComShips")) {
 				
-				m_CollisionExplosion.transform.position = transform.position;
-				m_CollisionExplosion.Play ();
-				m_ExplosionSound.Play ();
+				Explode ();
 				col.gameObject.GetComponent<ShipStatusController> ().Damage (m_DamageAmount);
 				gameObject.SetActive (false);
 
 			} else {
 				
-				m_CollisionExplosion.transform.position = transform.position;
-				m_CollisionExplosion.Play ();
-				m_ExplosionSound.Play ();
+				Explode ();
 				gameObject.SetActive (false); //explode but don't call damage if hit something that's not a ship
 
 
 			}
 		}
+	}
+
+	/// <summary>
+	/// this function gets called to activate various explosion effects of the cannonball
+	/// </summary>
+	virtual protected void Explode(){
+		m_CollisionExplosion.transform.position = transform.position;
+		m_CollisionExplosion.Play ();
+		m_ExplosionSound.Play ();
+
 	}
 
 	//This function will be called by the Damagecontroller before firing to determine the damage the cannonball is to do.
@@ -60,8 +76,25 @@ public class CannonballController : MonoBehaviour {
 	/// <summary>
 	/// This gets called when the cannonball is instantiated so as to not cause friendly fire
 	/// </summary>
-	public void SetTeamLayer(int layer){
-		m_FriendlyLayer = layer;
+	public void SetEnemyLayer(LayerMask enemyLayerMask){
+		
+		m_EnemyLayerMask = enemyLayerMask;
+		int playerMask = 1 << LayerMask.NameToLayer ("PlayerShips");
+		int comMask = 1 << LayerMask.NameToLayer ("ComShips");
+
+		if ((enemyLayerMask.value & playerMask) > 0) { //if enemymask and playermask are the same then this is a com ship
+			
+			m_FriendlyLayer = LayerMask.NameToLayer ("ComShips");
+			m_EnemyLayer = LayerMask.NameToLayer ("PlayerShips");
+			m_FriendlyLayerMask = comMask;
+
+		} else {
+			
+			m_FriendlyLayer = LayerMask.NameToLayer ("PlayerShips");
+			m_EnemyLayer = LayerMask.NameToLayer ("ComShips");
+			m_FriendlyLayerMask = playerMask;
+
+		}
 
 	}
 

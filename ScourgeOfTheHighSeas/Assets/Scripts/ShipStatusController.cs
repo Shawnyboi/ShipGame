@@ -92,14 +92,16 @@ public class ShipStatusController : MonoBehaviour {
 	//Call this function when the ship runs out of HullStrength
 	public IEnumerator Die(){
 		if (!m_IsDying) {
-			
+			Debug.Log ("Ship destroyed");
 			m_IsDying = true;
 			m_DeathSound.Play ();
 			yield return new WaitForSeconds (m_DeathTime);
 			gameObject.SetActive (false);
-			gameObject.GetComponent<ShipMovementController> ().m_Waypoint.SetActive (false);
-			m_LevelManager.ShipDestroyed (m_PlayerTeam);
 
+			gameObject.GetComponent<ShipMovementController> ().m_Waypoint.SetActive (false);
+			if (m_LevelManager != null) {
+				m_LevelManager.ShipDestroyed (m_PlayerTeam);
+			}
 
 		}
 

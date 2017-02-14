@@ -26,7 +26,7 @@ public class ShipFireController : MonoBehaviour {
 
 	protected Transform m_Transform;
 
-	void Awake(){
+	virtual protected void Awake(){
 		m_Transform = gameObject.GetComponent<Transform> ();
 		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_Disposition = "aggressive";
@@ -37,7 +37,7 @@ public class ShipFireController : MonoBehaviour {
 
 	}
 
-	void Start(){
+	protected void Start(){
 
 		m_ShotVarianceDegrees = m_ShipAttributes.m_ShotVarianceDegrees;
 		m_PercentAccuracy = m_ShipAttributes.m_PercentAccuracy;
@@ -58,13 +58,13 @@ public class ShipFireController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	protected void Update () {
 		if (m_Target != null) {
 			
 			if (m_Target.activeSelf == false) {
-				
-				m_Target = null; //If we ever find our target has become inactive we set the pointer to null
+				Debug.Log ("Setting target to null");
+
+				SetTargetToNull (); //If we ever find our target has become inactive we set the pointer to null
 
 			}
 		}
@@ -83,7 +83,7 @@ public class ShipFireController : MonoBehaviour {
 	public void SetNewTarget(GameObject newTarget){
 		m_Target = newTarget;
 		if (!m_Attacking) {
-			StartCoroutine (Attack ());
+			StartCoroutine (Attack (newTarget));
 		}
 	}
 
@@ -188,7 +188,7 @@ public class ShipFireController : MonoBehaviour {
 		m_Cannonball.SetActive (true);
 		m_Cannonball.transform.position = firePosition;
 		m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
-		m_Cannonball.GetComponent<CannonballController> ().SetTeamLayer (this.gameObject.layer);
+		m_Cannonball.GetComponent<CannonballController> ().SetEnemyLayer (m_EnemyTeamMask);
 		StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
 		Vector3 trajectory = CalculateTrajectory (targetPosition, firePosition);
 		trajectory = VariateTrajectory (trajectory);
@@ -271,14 +271,18 @@ public class ShipFireController : MonoBehaviour {
 	/// This Coroutine will take care of determining when to fire 
 	/// It also puts a delay in between shots equal to the reload time
 	/// </summary>
-	protected IEnumerator Attack(){
+	protected IEnumerator Attack(GameObject newTarget){
 		
 		m_Attacking = true;
 
 		while (m_Target != null) {
 			
+			if (m_Target == null) {
+				break; //if the target becomes null in the middle of the attack we want to break out of the while loop
+			}
+
 			if (Fire (m_Target.transform.position)) {
-				
+				   
 				yield return new WaitForSeconds (m_ReloadTime);
 			}
 
@@ -294,7 +298,8 @@ public class ShipFireController : MonoBehaviour {
 	/// Sets the target of this ship to null.
 	/// </summary>
 	public void SetTargetToNull(){
-		
+		Debug.Log ("Setting target to null");
+
 		this.m_Target = null;
 
 	}

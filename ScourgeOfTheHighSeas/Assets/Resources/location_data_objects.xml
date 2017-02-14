@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Locations>
+	<Location name="America">
+		<Location_Index>0</Location_Index>
+		<Location_Connections>
+			<Location_Connection>1</Location_Connection>
+			<Location_Connection>2</Location_Connection>
+		</Location_Connections>
+		<Scene_Indeces>
+			<SceneIndex>2</SceneIndex>
+		</Scene_Indeces>
+	</Location>
+	<Location name="Europe">
+		<Location_Index>1</Location_Index>
+		<Location_Connections>
+			<Location_Connection>0</Location_Connection>
+			<Location_Connection>3</Location_Connection>
+		</Location_Connections>
+		<Scene_Indeces>
+			<SceneIndex>2</SceneIndex>
+		</Scene_Indeces>
+	</Location>
+	<Location name="South America">
+		<Location_Index>2</Location_Index>
+		<Location_Connections>
+			<Location_Connection>3</Location_Connection>
+			<Location_Connection>0</Location_Connection>
+		</Location_Connections>
+		<Scene_Indeces>
+			<SceneIndex>2</SceneIndex>
+		</Scene_Indeces>
+	</Location>
+	<Location name="Africa">
+		<Location_Index>3</Location_Index>
+		<Location_Connections>
+			<Location_Connection>1</Location_Connection>
+			<Location_Connection>2</Location_Connection>
+		</Location_Connections>
+		<Scene_Indeces>
+			<SceneIndex>2</SceneIndex>
+		</Scene_Indeces>
+	</Location>
+</Locations>
