@@ -44,6 +44,10 @@ public class OverworldDataController : MonoBehaviour {
 
 	}
 
+	public Dictionary<string, int> GetEventDictionaryForLevel(int levelSceneIndex){
+		return m_CurrentLevelData.m_LevelEventToEventIndex;
+	}
+
 	/// <summary>
 	/// A simple getter for the overworld controller to call to initialize itself
 	/// </summary>
@@ -102,11 +106,14 @@ public class OverworldDataController : MonoBehaviour {
 
 			}
 
-			foreach (XmlNode eventIndex in location["Event_Indeces"].ChildNodes) {
+			foreach (XmlNode locationEvent in location["Events"].ChildNodes) {
 				
 				int locEventIndex;
-				int.TryParse (eventIndex.InnerText, out locEventIndex);
+				int.TryParse (locationEvent["EventIndex"].InnerText, out locEventIndex);
 				locData.m_EventIndeces.Add (locEventIndex);
+				float eventProbability = float.Parse(locationEvent["EventProbability"].InnerText);
+				locData.m_EventsToProbabilities.Add (locEventIndex, eventProbability);
+					
 
 			}
 
@@ -133,18 +140,28 @@ public class OverworldDataController : MonoBehaviour {
 
 		LevelData levelData = new LevelData();
 
-		foreach (XmlNode scene in xmlDocument["Scenes"].ChildNodes) {
+		foreach (XmlNode level in xmlDocument["Levels"].ChildNodes) {//look through the document to find correct level information
 			
-			string stringAttribute = scene.Attributes ["index"].Value;
+			string stringAttribute = level.Attributes ["sceneIndex"].Value;
 			int intAttribute;
 			int.TryParse (stringAttribute, out intAttribute);
 
-			if (intAttribute == sceneIndex) {
+			if (intAttribute == sceneIndex) {//correct level has corresponding scene index
 
-				levelData.m_Boss = scene ["Boss"].InnerText;
+				levelData.m_Boss = level ["Boss"].InnerText;
 
-				foreach (XmlNode enemy in scene["Enemies"].ChildNodes) {
+				foreach (XmlNode enemy in level["Enemies"].ChildNodes) {//parse level enemies information
 					levelData.m_Enemies.Add (enemy.InnerText);
+				}
+
+				foreach (XmlNode levelEvent in level["Events"].ChildNodes) {//parse level event information
+
+					int eventIndex;
+					string eventIndexAsString = levelEvent ["Index"].InnerText;
+					int.TryParse (eventIndexAsString, out eventIndex);
+					string eventType = levelEvent ["EventType"].InnerText;
+					levelData.m_LevelEventToEventIndex.Add (eventType, eventIndex);
+
 				}
 			}
 		}
@@ -171,10 +188,31 @@ public class OverworldDataController : MonoBehaviour {
 
 	/// <summary>
 	/// This summary returns a random Event index associated with a location
+	/// The event returned however, is dependant on that event's probability
 	/// </summary>
 	/// <param name="locationIndex">Location index.</param>
 	public int GetRandomEventIndexAtLocation(int locationIndex){
-		return m_LocationDataList [locationIndex].m_EventIndeces [Random.Range (0, m_LocationDataList [locationIndex].m_EventIndeces.Count - 1)];
+		
+		float dieRoll = Random.Range (0.0f, 1.0f);//first draw a random number to compare percentages to
+		float probabilitySum = 0.0f;
+		float eventProbability;
+		Dictionary<int,float> eventDictionary = m_LocationDataList [locationIndex].m_EventsToProbabilities;
+
+		foreach (int eventIndex in eventDictionary.Keys) {//loop through events and their probabilities
+			
+			eventDictionary.TryGetValue (eventIndex, out eventProbability);
+			probabilitySum += eventProbability;//keep a running total of percentage of probability we have checked
+
+			if (dieRoll <= probabilitySum ) {//When the probability sum exceeds the die roll return the event we're up to
+				
+				return eventIndex;
+
+			}
+		}
+
+		Debug.Log ("GetRandomEventIndexAtLocation Error");
+		return -1;
+
 	}
 
 

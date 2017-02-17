@@ -17,11 +17,14 @@ public class LocationData{
 	public List<int> m_LocationConnections;
 	//These indeces correspond with the dialoguer dialogues
 	public List<int> m_EventIndeces;
+	//A dictionary which will store the values of events to the probabilities of those events occuring
+	public Dictionary<int,float> m_EventsToProbabilities;
 
 	//constructor
 	public LocationData (){
 		m_LocationConnections = new List<int> ();
 		m_EventIndeces = new List<int> ();
+		m_EventsToProbabilities = new Dictionary<int, float> ();
 	}
 
 

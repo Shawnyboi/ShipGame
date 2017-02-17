@@ -8,6 +8,7 @@ public class LevelManager : MonoBehaviour {
 	private SpawnPointContainer m_SpawnPointContainer;
 
 	private EventController m_EventController;
+	private Dictionary<string, int> m_EventDictionary;
 
 	//There can be up to three waves of computer ships for a standard level
 	public GameObject[] m_PlayerShips;
@@ -86,8 +87,7 @@ public class LevelManager : MonoBehaviour {
 																																										
 		}
 
-		SpawnNextWave ();
-		m_LevelStarted = true;
+		BeginLevel ();
 
 
 
@@ -107,7 +107,8 @@ public class LevelManager : MonoBehaviour {
 				if (m_LiveComShips.Count == 0) {
 
 					if (m_CurrentWave >= 3) {
-
+						TriggerLevelEvent ("WinLevel");
+						yield return StartCoroutine (m_EventController.WaitForDialogueToFinish ());
 						yield return StartCoroutine (m_LevelUIController.DisplayWinMessage ());
 						m_BattleOver = true;
 
@@ -119,7 +120,8 @@ public class LevelManager : MonoBehaviour {
 				}
 
 				if (m_LivePlayerShips.Count == 0) {
-
+					TriggerLevelEvent ("LoseLevel");
+					yield return StartCoroutine (m_EventController.WaitForDialogueToFinish ());
 					yield return StartCoroutine (m_LevelUIController.DisplayLoseMessage ());
 					m_BattleOver = true;
 
@@ -153,6 +155,13 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
+	private void BeginLevel(){
+		SpawnNextWave ();
+		TriggerLevelEvent ("BeginLevel");
+		m_LevelStarted = true;
+		
+	}
+
 	private void SpawnNextWave(){
 
 		GameObject[] ships;
@@ -164,12 +173,12 @@ public class LevelManager : MonoBehaviour {
 			spawns = m_SpawnPointContainer.m_ComSpawnPointsFirstWave;
 
 		} else if (m_CurrentWave == 2) {
-
+			TriggerLevelEvent ("SecondWave");
 			ships = m_ComShipsSecondWave;
 			spawns =m_SpawnPointContainer. m_ComSpawnPointsSecondWave;
 
 		} else if (m_CurrentWave == 3) {
-
+			TriggerLevelEvent ("ThirdWave");
 			ships = m_ComShipsThirdWave;
 			spawns = m_SpawnPointContainer.m_ComSpawnPointsThirdWave;
 
@@ -204,6 +213,28 @@ public class LevelManager : MonoBehaviour {
 	/// <returns>The live player ships.</returns>
 	public List<GameObject> GetLivePlayerShips(){
 		return m_LivePlayerShips;
+	}
+
+
+	public void InitializeEventDictionary(Dictionary<string, int> eventDictionary){
+		m_EventDictionary = eventDictionary;
+	}
+
+
+	/// <summary>
+	/// This function will begin a dialogue event that corresponds to an event in the event dictionary
+	/// Returns false if the event wasn't there
+	/// </summary>
+	private bool TriggerLevelEvent(string eventType){
+		int eventIndex;
+		bool eventTypeInDictionary = m_EventDictionary.TryGetValue (eventType, out eventIndex);
+
+		if (eventTypeInDictionary) {
+			m_EventController.StartEventDialogue (eventIndex);
+		}
+
+		return eventTypeInDictionary;
+
 	}
 
 

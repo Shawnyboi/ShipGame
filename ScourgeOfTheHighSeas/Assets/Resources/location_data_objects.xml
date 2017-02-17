@@ -6,9 +6,16 @@
 			<Location_Connection>1</Location_Connection>
 			<Location_Connection>2</Location_Connection>
 		</Location_Connections>
-		<Event_Indeces>
-			<EventIndex>2</EventIndex>
-		</Event_Indeces>
+		<Events>
+			<Event>
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event>
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
 	</Location>
 	<Location name="Europe">
 		<Location_Index>1</Location_Index>
@@ -16,9 +23,16 @@
 			<Location_Connection>0</Location_Connection>
 			<Location_Connection>3</Location_Connection>
 		</Location_Connections>
-		<Event_Indeces>
-			<EventIndex>2</EventIndex>
-		</Event_Indeces>
+		<Events>
+			<Event>
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event>
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
 	</Location>
 	<Location name="South America">
 		<Location_Index>2</Location_Index>
@@ -26,9 +40,16 @@
 			<Location_Connection>3</Location_Connection>
 			<Location_Connection>0</Location_Connection>
 		</Location_Connections>
-		<Event_Indeces>
-			<EventIndex>2</EventIndex>
-		</Event_Indeces>
+		<Events>
+			<Event>
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event>
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
 	</Location>
 	<Location name="Africa">
 		<Location_Index>3</Location_Index>
@@ -36,8 +57,15 @@
 			<Location_Connection>1</Location_Connection>
 			<Location_Connection>2</Location_Connection>
 		</Location_Connections>
-		<Event_Indeces>
-			<EventIndex>2</EventIndex>
-		</Event_Indeces>
+		<Events>
+			<Event>
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event>
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
 	</Location>
 </Locations>

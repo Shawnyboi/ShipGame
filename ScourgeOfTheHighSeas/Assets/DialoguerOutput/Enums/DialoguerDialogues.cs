@@ -2,4 +2,9 @@
 //	Do not modify this file, it will be overwritten by Dialoguer.
 public enum DialoguerDialogues{
 	GenericLocation = 0,
+	NothingHappens = 1,
+	GenericEnemyEncounter = 2,
+	ShipTestBegin = 3,
+	ShipTestWin = 4,
+	ShipTestLose = 5,
 }

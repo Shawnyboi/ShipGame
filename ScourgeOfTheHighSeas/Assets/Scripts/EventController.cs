@@ -111,4 +111,14 @@ public class EventController : MonoBehaviour {
 	private void UnpauseGame(){
 		Time.timeScale = 1f;
 	}
+
+	/// <summary>
+	/// A coroutine which will run as long as the dialogue box is on
+	/// </summary>
+	public IEnumerator WaitForDialogueToFinish(){
+		while (m_DialogueOn) {
+			yield return null;
+		}
+		yield return null;
+	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Scenes>
-	<Scene index="2">
+<Levels>
+	<Level sceneIndex="2">
 		<Boss></Boss>
 		<Enemies>
 			<Enemy>EnemyShip</Enemy>
@@ -10,5 +10,19 @@
 			<Enemy>EnemyShip</Enemy>
 			<Enemy>EnemyFrontFireShip</Enemy>
 		</Enemies>
-	</Scene>
-</Scenes>
+		<Events>
+			<Event>
+			    <EventType>BeginLevel</EventType>
+				<Index>3</Index>
+			</Event>
+			<Event>
+				<EventType>WinLevel</EventType>
+				<Index>4</Index>
+			</Event>
+			<Event>
+				<EventType>LoseLevel</EventType>
+				<Index>5</Index>
+			</Event>
+		</Events>
+	</Level>
+</Levels>

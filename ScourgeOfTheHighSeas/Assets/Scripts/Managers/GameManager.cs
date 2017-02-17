@@ -73,6 +73,8 @@ public class GameManager : MonoBehaviour {
 	public void PopulateLevelManager(int sceneIndex, LevelManager levelManager){
 
 		GameObject[] comShips = m_OverworldDataController.GetEnemyShipsForLevel (sceneIndex);
+		Dictionary<string, int> eventDictionary = m_OverworldDataController.GetEventDictionaryForLevel (sceneIndex);
+		levelManager.InitializeEventDictionary (eventDictionary);
 
 		int playerShipsToSpawn = Mathf.Min (m_CurrentLevelManager.m_PlayerShips.Length, m_PlayerDataController.GetFleetSize()); //determine how many player ships to take from fleet
 
