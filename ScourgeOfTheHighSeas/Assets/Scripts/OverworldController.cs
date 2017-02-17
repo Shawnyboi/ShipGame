@@ -9,6 +9,7 @@ using UnityEngine;
 public class OverworldController : MonoBehaviour {
 
 	public OverworldDataController m_OverworldDataController;
+	private EventController m_EventController;
 	private bool m_LocationSelected;
 	private int m_SelectedLevelIndex;
 	private GameObject m_CurrentLocationButton;
@@ -30,20 +31,19 @@ public class OverworldController : MonoBehaviour {
 
 
 	void Start(){
-		Debug.Log ("calling start for overworldcontroller");
+		m_EventController = GameObject.FindGameObjectWithTag ("EventController").GetComponent<EventController> ();
+		m_EventController.m_OverworldController = this;
 		m_CurrentLocationButton = m_LocationButtons[m_OverworldDataController.GetPlayerLocation ()];
 		UpdatePlayerSpriteLocation ();
 		StartCoroutine (WaitForLocationSelection());
 	}
 
 	public IEnumerator WaitForLocationSelection(){
-		Debug.Log ("starting wait for selection coroutinie");
 		while (!m_LocationSelected) {
 			
 			yield return null;
 
 		}
-		Debug.Log ("ending wait for selection coroutine");
 		yield return null;
 
 	}
@@ -54,23 +54,39 @@ public class OverworldController : MonoBehaviour {
 	/// It is intended to be called by a unity button.
 	/// It will break the WaitForSelection loop and therby the overworld loop in the game manager thus starting the new level.
 	/// </summary>
-	/// <param name="levelIndex">the scene index of the level in the build editor</param>
+	/// <param name="levelIndex">the scene index of the level in the build editor</param>   
 	/// <param name="buttonLocationIndex">the index of this location button in the location buttons array in the overworld controller.</param>
 	public void SelectLocation(int buttonLocationIndex){
 		if (m_CurrentLocationButton == m_LocationButtons[buttonLocationIndex]) {
-			Debug.Log ("Selecting Location");
-			m_LocationSelected = true;
-			m_SelectedLevelIndex = m_OverworldDataController.GetRandomSceneIndexAtLocation(buttonLocationIndex);
+			m_EventController.StartEventDialogue (0);
+			//Debug.Log ("Selecting Location");
+			//m_LocationSelected = true;
+			//m_SelectedLevelIndex = m_OverworldDataController.GetRandomSceneIndexAtLocation(buttonLocationIndex);
 		} else {
 			//check if we can move there
 			//move if posiible
+			//trigger event;
 			if (m_OverworldDataController.CheckIfLocationConnected (m_CurrentLocationButton.GetComponent<LocationButtonController> ().m_LocationIndex, buttonLocationIndex)) {
 				SetCurrentLocationButton (buttonLocationIndex);
 				UpdatePlayerSpriteLocation ();
+				m_EventController.StartEventDialogue(m_OverworldDataController.GetRandomEventIndexAtLocation (buttonLocationIndex));
 			}
 		}
 	}
+	/// <summary>
+	/// Sets the selected level index variable in order to cause the game manager to load it
+	/// </summary>
+	/// <param name="sceneIndex">Scene index.</param>
+	public void SetSelectedLevelSceneIndex(int sceneIndex){
+		Debug.Log ("Setting level scene index confirmed " + sceneIndex);
+		m_SelectedLevelIndex = sceneIndex;
+		m_LocationSelected = true;
 
+	}
+	/// <summary>
+	/// Gets the index of the selected scene.
+	/// </summary>
+	/// <returns>The selected level scene index.</returns>
 	public int GetSelectedLevelSceneIndex(){
 		return m_SelectedLevelIndex;
 	}
@@ -100,6 +116,7 @@ public class OverworldController : MonoBehaviour {
 		m_OverworldDataController.SetPlayerLocation (indexOfLocationButton);
 		m_CurrentLocationButton = m_LocationButtons [indexOfLocationButton];
 	}
-		
+
+
 
 }

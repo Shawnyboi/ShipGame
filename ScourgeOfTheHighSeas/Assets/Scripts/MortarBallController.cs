@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//The mortar ball is a special type of cannon ball that explodees so it needs a special controller
 public class MortarBallController : CannonballController {
 
 	public float m_ExplosionRadius;

@@ -25,21 +25,9 @@ public class GameManager : MonoBehaviour {
 
 	void Awake (){
 		DontDestroyOnLoad (gameObject);// we want the game manager to stay around all the time
+		Dialoguer.Initialize();
 
 	}
-
-
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
 
 
 	/// <summary>
@@ -82,7 +70,7 @@ public class GameManager : MonoBehaviour {
 	/// This function will be called in the game manager and it will fill the current level manager with ships based on the scene
 	/// the level manager being populated it passed in as a 
 	/// </summary>
-	public void PopulateLevelManagerShips(int sceneIndex, LevelManager levelManager){
+	public void PopulateLevelManager(int sceneIndex, LevelManager levelManager){
 
 		GameObject[] comShips = m_OverworldDataController.GetEnemyShipsForLevel (sceneIndex);
 
@@ -180,7 +168,7 @@ public class GameManager : MonoBehaviour {
 		} else {//This means we went to some other level
 			
 			m_CurrentLevelManager = Instantiate (m_GenericLevelManagerPrefab).GetComponent<LevelManager> ();
-			PopulateLevelManagerShips (scene.buildIndex, m_CurrentLevelManager);
+			PopulateLevelManager (scene.buildIndex, m_CurrentLevelManager);
 			StartCoroutine (LevelLoop ());
 
 		}

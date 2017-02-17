@@ -15,13 +15,20 @@ public class OverworldDataController : MonoBehaviour {
 
 	public GameObject[] m_GenericEnemyShips;
 	private List<LocationData> m_LocationDataList;
+	private LevelData m_CurrentLevelData;
+
+	private string m_LocationDataFile = "location_data_objects";
+	private string m_LevelDataFile = "level_data_objects";
+	private string m_EnemyShipFolderName = "EnemyShips";
 
 	private int m_PlayerLocation;
 
 	void Awake () {
+		
 		m_LocationDataList = new List <LocationData>();
-		LoadLocationData ("location_data_objects");
+		LoadLocationData (m_LocationDataFile);
 		DontDestroyOnLoad (gameObject);
+
 	}
 
 	/// <summary>
@@ -31,8 +38,9 @@ public class OverworldDataController : MonoBehaviour {
 	/// <returns>The enemy ships for level.</returns>
 	/// <param name="levelSceneIndex">Level scene index.</param>
 	public GameObject[] GetEnemyShipsForLevel(int levelSceneIndex){
-		//for now we just return the generic enemyships
-		return m_GenericEnemyShips;
+
+		LoadLevelData (levelSceneIndex, m_LevelDataFile);
+		return CreateEnemyShipArrayFromLevelData ();
 
 	}
 
@@ -87,35 +95,61 @@ public class OverworldDataController : MonoBehaviour {
 			locData.m_LocationIndex = locIndex;
 
 			foreach (XmlNode connection in location["Location_Connections"].ChildNodes) {
+				
 				int locConnection;
 				int.TryParse (connection.InnerText, out locConnection);
 				locData.m_LocationConnections.Add (locConnection);  
+
 			}
 
-			foreach (XmlNode sceneIndex in location["Scene_Indeces"].ChildNodes) {
-				int locSceneIndex;
-				int.TryParse (sceneIndex.InnerText, out locSceneIndex);
-				locData.m_SceneIndeces.Add (locSceneIndex);
+			foreach (XmlNode eventIndex in location["Event_Indeces"].ChildNodes) {
+				
+				int locEventIndex;
+				int.TryParse (eventIndex.InnerText, out locEventIndex);
+				locData.m_EventIndeces.Add (locEventIndex);
+
 			}
+
 			//add each created location data object to the member list
 			m_LocationDataList.Add (locData);
+
 		}
 
 		//order list by location index value
 		m_LocationDataList.Sort ((x, y) => x.m_LocationIndex.CompareTo (y.m_LocationIndex));
 
-		foreach (LocationData locData in m_LocationDataList) {
-			Debug.Log ("location index " + locData.m_LocationIndex);
-			Debug.Log ("location name " + locData.m_LocationName);
-			Debug.Log ("Connections: ");				
-			foreach (int connection in locData.m_LocationConnections) {
-				Debug.Log (connection);
-			}
-			Debug.Log ("Scene Indeces: ");
-			foreach (int scene in locData.m_SceneIndeces) {
-				Debug.Log (scene);
+	}
+
+	/// <summary>
+	/// This function loads the information from an xml file into a scenedata object and stores it in the memeber scene data object of this class
+	/// </summary>
+	/// <param name="sceneIndex">index to identitfy the scene to be loaded.</param>
+	private void LoadLevelData(int sceneIndex, string dataPath){
+		
+		//get the xml file as a string and turn that into an "XmlDocument" Object
+		TextAsset locationDataFile = Resources.Load (dataPath) as TextAsset;
+		XmlDocument xmlDocument = new XmlDocument ();
+		xmlDocument.LoadXml (locationDataFile.text);
+
+		LevelData levelData = new LevelData();
+
+		foreach (XmlNode scene in xmlDocument["Scenes"].ChildNodes) {
+			
+			string stringAttribute = scene.Attributes ["index"].Value;
+			int intAttribute;
+			int.TryParse (stringAttribute, out intAttribute);
+
+			if (intAttribute == sceneIndex) {
+
+				levelData.m_Boss = scene ["Boss"].InnerText;
+
+				foreach (XmlNode enemy in scene["Enemies"].ChildNodes) {
+					levelData.m_Enemies.Add (enemy.InnerText);
+				}
 			}
 		}
+
+		m_CurrentLevelData = levelData;
 
 	}
 
@@ -136,40 +170,35 @@ public class OverworldDataController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// This summary returns a random scene index associated with a location
+	/// This summary returns a random Event index associated with a location
 	/// </summary>
 	/// <param name="locationIndex">Location index.</param>
-	public int GetRandomSceneIndexAtLocation(int locationIndex){
-		return m_LocationDataList [locationIndex].m_SceneIndeces [Random.Range (0, m_LocationDataList [locationIndex].m_SceneIndeces.Count - 1)];
+	public int GetRandomEventIndexAtLocation(int locationIndex){
+		return m_LocationDataList [locationIndex].m_EventIndeces [Random.Range (0, m_LocationDataList [locationIndex].m_EventIndeces.Count - 1)];
 	}
 
+
+	private GameObject[] CreateEnemyShipArrayFromLevelData(){
+		
+		if (m_CurrentLevelData == null) {
+			Debug.Log ("Scene data not loaded properly");
+			return null;
+		}
+
+		GameObject[] shipArray = new GameObject[m_CurrentLevelData.m_Enemies.Count];
+
+		for (int i = 0; i < shipArray.Length; i++) {
+			
+			GameObject ship = Resources.Load (m_EnemyShipFolderName + "/" + m_CurrentLevelData.m_Enemies [i]) as GameObject;
+
+			shipArray [i] = ship;
+
+		}
+
+		return shipArray;
+	}
 
 
 }
 
-/// <summary>
-/// This class will contain information pertaining to a specific game location
-/// They should be created by reading xml files
-/// </summary>
-//[XmlRoot ("Location")]
-public class LocationData{
 
-
-	//the name of this location 
-	public string m_LocationName;
-	//the identifier of this location
-	public int m_LocationIndex;
-	//the locations that can be traveled to from this location
-	public List<int> m_LocationConnections;
-	//the scenes associated with this location
-	public List<int> m_SceneIndeces;
-
-	//constructor
-	public LocationData (){
-		m_LocationConnections = new List<int> ();
-		m_SceneIndeces = new List<int> ();
-	}
-	
-
-
-}

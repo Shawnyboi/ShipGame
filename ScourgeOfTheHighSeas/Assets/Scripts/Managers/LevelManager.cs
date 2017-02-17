@@ -7,6 +7,8 @@ public class LevelManager : MonoBehaviour {
 
 	private SpawnPointContainer m_SpawnPointContainer;
 
+	private EventController m_EventController;
+
 	//There can be up to three waves of computer ships for a standard level
 	public GameObject[] m_PlayerShips;
 	public ShipAttributesData[] m_PlayerShipAttributesData;
@@ -44,6 +46,8 @@ public class LevelManager : MonoBehaviour {
 		m_LivePlayerShips = new List<GameObject> ();
 
 		m_LevelUIController = this.gameObject.GetComponent<LevelUIController> ();
+
+		m_EventController = GameObject.FindGameObjectWithTag ("EventController").GetComponent<EventController> ();
 
 		//The number of ships to be generated are determined by the spawn point container object which is in each level
 		m_SpawnPointContainer = GameObject.FindGameObjectWithTag ("SpawnPointContainer").GetComponent<SpawnPointContainer>();

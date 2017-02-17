@@ -30,12 +30,4 @@ public class LocationButtonController : MonoBehaviour {
 		m_RectTransform.anchorMax = new Vector2 (m_ButtonWidth, m_ButtonHeight);
 		m_RectTransform.sizeDelta = new Vector2 (m_ButtonRect.width, m_ButtonRect.height);
 	}
-	// Use this for initialization
-	void Start () {
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

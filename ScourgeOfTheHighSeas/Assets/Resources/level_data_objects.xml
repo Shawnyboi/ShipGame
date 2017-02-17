@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scenes>
+	<Scene index="2">
+		<Boss></Boss>
+		<Enemies>
+			<Enemy>EnemyShip</Enemy>
+			<Enemy>EnemyShip</Enemy>
+			<Enemy>EnemyShip</Enemy>
+			<Enemy>EnemyShip</Enemy>
+			<Enemy>EnemyShip</Enemy>
+			<Enemy>EnemyFrontFireShip</Enemy>
+		</Enemies>
+	</Scene>
+</Scenes>
