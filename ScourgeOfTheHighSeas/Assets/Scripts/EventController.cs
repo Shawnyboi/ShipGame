@@ -9,6 +9,10 @@ public class EventController : MonoBehaviour {
 
 	public OverworldController m_OverworldController;
 
+	public GUIStyle m_GUIStyle;
+
+	public bool m_InOverworld;
+
 	private bool m_DialogueOn;
 
 	private string m_CurrentDialogueText;
@@ -16,10 +20,18 @@ public class EventController : MonoBehaviour {
 
 	private float m_TimeScalePauseFactor = .00001f;
 
+	private int m_NotEnoughMoneyEventIndex = 6;
 
+	void Awake(){
+		if (m_OverworldController != null) {
+			m_OverworldController = null;
+		}
+	}
 
 	void Start(){
-		
+		if (m_InOverworld) {
+			m_OverworldController = GameObject.FindGameObjectWithTag ("OverworldController").GetComponent<OverworldController> ();
+		}
 		Dialoguer.events.onStarted += OnDialogueStarted;
 		Dialoguer.events.onEnded += OnDialogueEnded;
 		Dialoguer.events.onTextPhase += OnTextPhase;
@@ -69,11 +81,19 @@ public class EventController : MonoBehaviour {
 		Debug.Log ("Message Event: " + message);
 		Debug.Log ("Metadata: " + metadata);
 
-		if (message == "GoToLevel" && m_OverworldController != null){//this tells us we are in the overworld and we want to begin a level
+		if (message == "GoToLevel" && m_OverworldController != null) {//this tells us we are in the overworld and we want to begin a level
 			
 			int levelSceneIndex;
 			int.TryParse (metadata, out levelSceneIndex);
 			m_OverworldController.SetSelectedLevelSceneIndex (levelSceneIndex);
+
+		} else if (message == "RepairShips" && m_OverworldController != null) {
+			Debug.Log ("repairing ships");
+			Debug.Log ("m_OverworldController.name: " + m_OverworldController.name);
+			bool repaired = m_OverworldController.GoToRepair ();
+			if (!repaired) {
+				StartEventDialogue (m_NotEnoughMoneyEventIndex);
+			}
 
 		}
 	}
@@ -110,6 +130,13 @@ public class EventController : MonoBehaviour {
 
 	private void UnpauseGame(){
 		Time.timeScale = 1f;
+	}
+
+	/// <summary>
+	/// Sets the overworld controller.
+	/// </summary>
+	public void SetOverworldController(OverworldController overWorldController){
+		m_OverworldController = overWorldController;
 	}
 
 	/// <summary>

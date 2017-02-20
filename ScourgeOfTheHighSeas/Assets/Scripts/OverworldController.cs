@@ -9,6 +9,8 @@ using UnityEngine;
 public class OverworldController : MonoBehaviour {
 
 	public OverworldDataController m_OverworldDataController;
+	public PlayerDataController m_PlayerDataController;
+
 	private EventController m_EventController;
 	private bool m_LocationSelected;
 	private int m_SelectedLevelIndex;
@@ -24,20 +26,35 @@ public class OverworldController : MonoBehaviour {
 	public float m_PlayerSpriteWidth;
 	public float m_PlayerSpriteHeight;
 
+	public int m_RepairCost;
+
+	private int m_CurrentPlayerGold;
+
 	void Awake(){
 		m_LocationSelected = false;
+		if (m_EventController != null) {
+			m_EventController = null;
+		}		
 	}
 
 
 
 	void Start(){
+		
+
+
 		m_EventController = GameObject.FindGameObjectWithTag ("EventController").GetComponent<EventController> ();
-		m_EventController.m_OverworldController = this;
+
+		m_CurrentPlayerGold = m_PlayerDataController.GetPlayerGold ();
+
 		m_CurrentLocationButton = m_LocationButtons[m_OverworldDataController.GetPlayerLocation ()];
 		UpdatePlayerSpriteLocation ();
-		StartCoroutine (WaitForLocationSelection());
-	}
 
+	}
+	/// <summary>
+	/// this coroutine checks every frame if a new location is selected if it is the coroutine returns
+	/// We use this to signal to the game manager when to switch scenes
+	/// </summary>
 	public IEnumerator WaitForLocationSelection(){
 		while (!m_LocationSelected) {
 			
@@ -46,6 +63,10 @@ public class OverworldController : MonoBehaviour {
 		}
 		yield return null;
 
+	}
+
+	void OnGUI(){
+		GUI.Box (new Rect (Screen.width * .40f, Screen.height * .05f, Screen.width * .2f, Screen.height * .05f), "Booty: " + m_CurrentPlayerGold);
 	}
 
 
@@ -89,6 +110,39 @@ public class OverworldController : MonoBehaviour {
 	/// <returns>The selected level scene index.</returns>
 	public int GetSelectedLevelSceneIndex(){
 		return m_SelectedLevelIndex;
+	}
+
+	/// <summary>
+	/// Deducts an amount of gold from the players stash
+	/// </summary>
+	public void SpendGold(int amount){
+		m_PlayerDataController.ChangePlayerGold (-amount);
+		m_CurrentPlayerGold = m_PlayerDataController.GetPlayerGold ();
+
+	}
+
+	/// <summary>
+	/// Adds an amount of gold to the players stash
+	/// </summary>
+	/// <param name="amount">Amount.</param>
+	public void EarnGold(int amount){
+		m_PlayerDataController.ChangePlayerGold (amount);
+		m_CurrentPlayerGold = m_PlayerDataController.GetPlayerGold ();
+
+	}
+	/// <summary>
+	/// Gets called when the repair ships option is chosen at some location
+	/// </summary>
+	/// <returns><c>true</c>, if had enough money to repair, <c>false</c> otherwise.</returns>
+	public bool GoToRepair(){
+		Debug.Log ("calling go to repair");
+		if (m_CurrentPlayerGold >= m_RepairCost) {
+			m_PlayerDataController.RepairFleet ();
+			SpendGold (m_RepairCost);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/// <summary>

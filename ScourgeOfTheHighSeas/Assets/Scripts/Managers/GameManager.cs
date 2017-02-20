@@ -33,10 +33,14 @@ public class GameManager : MonoBehaviour {
 	/// <summary>
 	/// This will get called after the game manager is instantiated to set some receive certain member variable references
 	/// </summary>
-	public void InitializeGameManager(OverworldDataController overworldDataController, PlayerDataController playerDataController){
+	public void InitializeGameManager(OverworldDataController overworldDataController, PlayerDataController playerDataController, bool newGame){
 		
 		m_OverworldDataController = overworldDataController;
 		m_PlayerDataController = playerDataController;
+		if (!newGame) {
+			GameDataController gameDataController = new GameDataController ();
+			gameDataController.Load (m_OverworldDataController, m_PlayerDataController);
+		}
 		m_OverworldSceneIndex = 1;
 		m_OverworldControllerTag = "OverworldController";
 		GoToOverworld ();
@@ -140,7 +144,9 @@ public class GameManager : MonoBehaviour {
 		foreach (GameObject ship in survivingShips) {
 			m_PlayerDataController.AddShipToFleet (ship);
 		}
-		m_PlayerDataController.AutoSave ();
+		GameDataController gameDataController = new GameDataController ();
+		gameDataController.Save (m_OverworldDataController, m_PlayerDataController);
+
 	}
 
 
@@ -165,6 +171,7 @@ public class GameManager : MonoBehaviour {
 		if (scene.buildIndex == m_OverworldSceneIndex) {//This means we went to the overworld
 			m_CurrentOverworldController = GameObject.FindGameObjectWithTag(m_OverworldControllerTag).GetComponent<OverworldController>();
 			m_CurrentOverworldController.m_OverworldDataController = m_OverworldDataController;
+			m_CurrentOverworldController.m_PlayerDataController = m_PlayerDataController;
 			StartCoroutine (OverworldLoop ());
 
 		} else {//This means we went to some other level

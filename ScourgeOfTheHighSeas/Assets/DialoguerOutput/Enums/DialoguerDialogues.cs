@@ -7,4 +7,5 @@ public enum DialoguerDialogues{
 	ShipTestBegin = 3,
 	ShipTestWin = 4,
 	ShipTestLose = 5,
+	NotEnoughMoney = 6,
 }

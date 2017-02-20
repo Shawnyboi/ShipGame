@@ -15,6 +15,7 @@ public class OverworldDataController : MonoBehaviour {
 
 	public GameObject[] m_GenericEnemyShips;
 	private List<LocationData> m_LocationDataList;
+	private List<int> m_PastEvents;
 	private LevelData m_CurrentLevelData;
 
 	private string m_LocationDataFile = "location_data_objects";
@@ -65,15 +66,34 @@ public class OverworldDataController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Passes in the overworld data.
+	/// Should come in from a save file
+	/// </summary>
+	/// <param name="playerLocation">Player location.</param>
+	/// <param name="pastEvents">Past events.</param>
+	public void PassInOverworldData(int playerLocation, List<int> pastEvents){
+		m_PastEvents = pastEvents;
+		m_PlayerLocation = playerLocation;
+	}
+
+	/// <summary>
+	/// A getter to access the list of indeces of the past events
+	/// </summary>
+	/// <returns>The past events.</returns>
+	public List<int> GetPastEvents(){
+		return m_PastEvents;
+	}
+
+
+	/// <summary>
 	/// Initializes the overworld data controller by setting the player's current location to the aprropriate initial location.
 	/// </summary>
 	/// <param name="newGame">If set to <c>true</c> new game.</param>
 	/// <param name="saveIndex"> the index where the save file is held</param>
 	public void InitializeOverworldDataController(bool newGame = true, int saveIndex = 0){
 		if (newGame) {
-			m_PlayerLocation = 0;
-		} else if (saveIndex == 0) {
-			//load saved position
+			m_PlayerLocation = 0; 
+			m_PastEvents = new List<int> ();
 		}
 	}
 	/// <summary>

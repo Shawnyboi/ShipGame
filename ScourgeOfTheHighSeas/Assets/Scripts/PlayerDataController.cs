@@ -15,11 +15,14 @@ public class PlayerDataController : MonoBehaviour {
 	private string m_ShipFolderName = "Ships";
 	private string m_StarterShipName = "Ship";
 	private int m_StarterFleetSize = 3;
+	private int m_StartingGold = 30;
 
-	private string m_AutosaveFileName = "PlayerFleetAutosaveData";
+
 
 	//the player fleet must be a list of easily copied and controlled structs so they can be saved and kept between scenes
 	private List<ShipAttributesData> m_PlayerFleet;
+
+	private int m_PlayerGold;
 
 	void Awake () {
 		DontDestroyOnLoad (gameObject);
@@ -42,6 +45,42 @@ public class PlayerDataController : MonoBehaviour {
 	public GameObject GetShipFromFleet(int index){
 		GameObject ship = Resources.Load (m_ShipFolderName + "/" + m_PlayerFleet [index].shipName) as GameObject;
 		return ship; 
+	}
+
+	/// <summary>
+	/// A function to get the list of ship data 
+	/// </summary>
+	/// <returns>The fleet data.</returns>
+	public List<ShipAttributesData> GetFleetData(){ 
+		return m_PlayerFleet;
+	}
+
+	/// <summary>
+	/// Set the player fleet and player gold
+	/// Data should be coming in from a save file
+	/// </summary>
+	/// <param name="fleetData">Fleet data.</param>
+	/// <param name="playerGold">Player gold.</param>
+	public void PassInPlayerData(List<ShipAttributesData> fleetData, int playerGold){
+		m_PlayerFleet = fleetData;
+		m_PlayerGold = playerGold;
+	}
+
+	/// <summary>
+	/// Gets the player gold.
+	/// </summary>
+	/// <returns>The player gold.</returns>
+	public int GetPlayerGold(){
+		return m_PlayerGold;
+	}
+
+	/// <summary>
+	/// Changes the player gold.
+	/// Can add or subtract depending on if the parameter is negative
+	/// </summary>
+	/// <param name="amount">Amount.</param>
+	public void ChangePlayerGold(int amount){
+		m_PlayerGold += amount;
 	}
 
 	/// <summary>
@@ -97,6 +136,16 @@ public class PlayerDataController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Sets the current hull strength of each ship to its maximum
+	/// </summary>
+	public void RepairFleet(){
+		for (int i = 0; i < m_PlayerFleet.Count; i++) {
+			m_PlayerFleet [i].currentHullStrength = m_PlayerFleet [i].maxHullStrength;
+		}
+
+	}
+
+	/// <summary>
 	/// Initializes the player data controller by constructing the fleet list and filling it with the appropriate ships
 	/// </summary>
 	/// <param name="newGame">If set to <c>true</c> new game.</param>
@@ -105,39 +154,14 @@ public class PlayerDataController : MonoBehaviour {
 		m_PlayerFleet = new List<ShipAttributesData> ();
 
 		if (newGame) {
+			m_PlayerGold = m_StartingGold;
 			for (int i = 0; i < m_StarterFleetSize; i++) {
 				AddShipToFleet (m_StarterShipName); //if its a new game we make the fleet three generic ships
 			}
-		} else if (saveIndex == 0) {
-			LoadPlayerFleetAutoSave ();//if its a load game with no save index selected we load the autosave
-		}
+		} 
 	}
 
-	/// <summary>
-	/// After every battle serialize and save the PlayerFleet object to the autosave file path;
-	/// </summary>
-	public void AutoSave(){
-		BinaryFormatter binaryFormatter = new BinaryFormatter ();
-		FileStream file = File.Create (Application.persistentDataPath + "/" + m_AutosaveFileName + ".dat");
 
-		binaryFormatter.Serialize (file, m_PlayerFleet);
-		file.Close ();
-	}
-
-	/// <summary>
-	/// Get the last autosaved player fleet and set the current one equal to it
-	/// </summary>
-	public void LoadPlayerFleetAutoSave(){
-
-		if (File.Exists (Application.persistentDataPath + "/" + m_AutosaveFileName + ".dat")) {
-			BinaryFormatter binaryFormatter = new BinaryFormatter ();
-			FileStream file = File.Open (Application.persistentDataPath + "/" + m_AutosaveFileName + ".dat", FileMode.Open);
-			List<ShipAttributesData> savedFleet = (List<ShipAttributesData>)binaryFormatter.Deserialize (file);
-			file.Close ();
-			m_PlayerFleet = savedFleet;
-		}
-
-	}
 
 }
 
@@ -146,7 +170,7 @@ public class PlayerDataController : MonoBehaviour {
 /// It contains all the data necesarry for instantiating the ships attributes as the player would remember them
 /// </summary>
 [Serializable]
-public struct ShipAttributesData{
+public class ShipAttributesData{
 
 	public float speed;
 	public float turningSpeed;

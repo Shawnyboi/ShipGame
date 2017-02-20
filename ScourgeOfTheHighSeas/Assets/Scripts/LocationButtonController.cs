@@ -21,7 +21,7 @@ public class LocationButtonController : MonoBehaviour {
 
 
 
-	void Awake(){
+	void OnGUI(){
 		m_ScreenWidth = Screen.width;
 		m_ScreenHeight = Screen.height;
 		m_ButtonRect = new Rect(new Vector2 (m_ScreenWidth * m_ButtonXCoordinate,  m_ScreenHeight * m_ButtonYCoordinate), new Vector2 (m_ScreenWidth * m_ButtonWidth, m_ScreenHeight * m_ButtonHeight));
