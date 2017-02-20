@@ -130,6 +130,22 @@ public class OverworldController : MonoBehaviour {
 		m_CurrentPlayerGold = m_PlayerDataController.GetPlayerGold ();
 
 	}
+
+	/// <summary>
+	/// Gets called when the player buys a ship at the shop
+	/// adds the ship to the player fleet if the player has enough money
+	/// </summary>
+	public bool BuyShip(string shipType, int shipCost){
+		if (m_CurrentPlayerGold >= shipCost) {
+			m_PlayerDataController.AddShipToFleet (shipType);
+			SpendGold (shipCost);
+			return true;
+		} else {
+			return false;
+		}
+
+
+	}
 	/// <summary>
 	/// Gets called when the repair ships option is chosen at some location
 	/// </summary>

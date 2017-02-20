@@ -7,11 +7,11 @@
 			<Location_Connection>2</Location_Connection>
 		</Location_Connections>
 		<Events>
-			<Event>
+			<Event unique="False">
 				<EventIndex>1</EventIndex>
 				<EventProbability>.8</EventProbability>
 			</Event>
-			<Event>
+			<Event unique="False">
 				<EventIndex>2</EventIndex>
 				<EventProbability>.2</EventProbability>
 			</Event>
@@ -24,11 +24,11 @@
 			<Location_Connection>3</Location_Connection>
 		</Location_Connections>
 		<Events>
-			<Event>
+			<Event unique="False">
 				<EventIndex>1</EventIndex>
 				<EventProbability>.8</EventProbability>
 			</Event>
-			<Event>
+			<Event unique="False">
 				<EventIndex>2</EventIndex>
 				<EventProbability>.2</EventProbability>
 			</Event>
@@ -41,13 +41,17 @@
 			<Location_Connection>0</Location_Connection>
 		</Location_Connections>
 		<Events>
-			<Event>
-				<EventIndex>1</EventIndex>
-				<EventProbability>.8</EventProbability>
+			<Event unique="True">
+				<EventIndex>7</EventIndex>
+				<EventProbability>.5</EventProbability>
 			</Event>
-			<Event>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.4</EventProbability>
+			</Event>
+			<Event unique="False">
 				<EventIndex>2</EventIndex>
-				<EventProbability>.2</EventProbability>
+				<EventProbability>.1</EventProbability>
 			</Event>
 		</Events>
 	</Location>
@@ -58,11 +62,11 @@
 			<Location_Connection>2</Location_Connection>
 		</Location_Connections>
 		<Events>
-			<Event>
+			<Event unique="False">
 				<EventIndex>1</EventIndex>
 				<EventProbability>.8</EventProbability>
 			</Event>
-			<Event>
+			<Event unique="False">
 				<EventIndex>2</EventIndex>
 				<EventProbability>.2</EventProbability>
 			</Event>

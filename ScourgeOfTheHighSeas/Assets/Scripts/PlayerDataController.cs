@@ -15,7 +15,7 @@ public class PlayerDataController : MonoBehaviour {
 	private string m_ShipFolderName = "Ships";
 	private string m_StarterShipName = "Ship";
 	private int m_StarterFleetSize = 3;
-	private int m_StartingGold = 30;
+	private int m_StartingGold = 100;
 
 
 
@@ -43,8 +43,18 @@ public class PlayerDataController : MonoBehaviour {
 	/// <returns>The ship from fleet.</returns>
 	/// <param name="index">Index in fleet.</param>
 	public GameObject GetShipFromFleet(int index){
+		Debug.Log("get ship from fleet path: "+ m_ShipFolderName + "/" + m_PlayerFleet [index].shipName);
 		GameObject ship = Resources.Load (m_ShipFolderName + "/" + m_PlayerFleet [index].shipName) as GameObject;
 		return ship; 
+	}
+
+	/// <summary>
+	/// Gets the ship attributes data struct from fleet at the index passed in by the parameter.
+	/// </summary>
+	/// <returns>The ship attributes data struct from m_PlayerFleet in PlayerDataController.</returns>
+	/// <param name="index">Index in fleet.</param>
+	public ShipAttributesData GetShipAttributesDataFromFleet(int index){
+		return m_PlayerFleet [index];
 	}
 
 	/// <summary>
@@ -83,14 +93,7 @@ public class PlayerDataController : MonoBehaviour {
 		m_PlayerGold += amount;
 	}
 
-	/// <summary>
-	/// Gets the ship attributes data struct from fleet at the index passed in by the parameter.
-	/// </summary>
-	/// <returns>The ship attributes data struct from m_PlayerFleet in PlayerDataController.</returns>
-	/// <param name="index">Index in fleet.</param>
-	public ShipAttributesData GetShipAttributesDataFromFleet(int index){
-		return m_PlayerFleet [index];
-	}
+
 
 	/// <summary>
 	/// Add a ship to the fleet by passing in its prefab name

@@ -7,7 +7,8 @@ using UnityEngine;
 /// </summary>
 public class EventController : MonoBehaviour {
 
-	public OverworldController m_OverworldController;
+	private OverworldController m_OverworldController;
+	private PlayerDataController m_PlayerDataController;
 
 	public GUIStyle m_GUIStyle;
 
@@ -20,7 +21,8 @@ public class EventController : MonoBehaviour {
 
 	private float m_TimeScalePauseFactor = .00001f;
 
-	private int m_NotEnoughMoneyEventIndex = 6;
+	private static int m_NotEnoughMoneyEventIndex = 6;
+	private static int m_ThankYouEventIndex = 9;
 
 	void Awake(){
 		if (m_OverworldController != null) {
@@ -32,11 +34,20 @@ public class EventController : MonoBehaviour {
 		if (m_InOverworld) {
 			m_OverworldController = GameObject.FindGameObjectWithTag ("OverworldController").GetComponent<OverworldController> ();
 		}
+		m_PlayerDataController = GameObject.FindGameObjectWithTag ("PlayerDataController").GetComponent<PlayerDataController> ();
+
 		Dialoguer.events.onStarted += OnDialogueStarted;
 		Dialoguer.events.onEnded += OnDialogueEnded;
 		Dialoguer.events.onTextPhase += OnTextPhase;
 		Dialoguer.events.onMessageEvent += ReadMessageEvent;
 
+	}
+
+	void OnDestroy(){
+		Dialoguer.events.onStarted -= OnDialogueStarted;
+		Dialoguer.events.onEnded -= OnDialogueEnded;
+		Dialoguer.events.onTextPhase -= OnTextPhase;
+		Dialoguer.events.onMessageEvent -= ReadMessageEvent;
 	}
 
 	public void StartEventDialogue(int dialoguerIndex){
@@ -88,13 +99,41 @@ public class EventController : MonoBehaviour {
 			m_OverworldController.SetSelectedLevelSceneIndex (levelSceneIndex);
 
 		} else if (message == "RepairShips" && m_OverworldController != null) {
-			Debug.Log ("repairing ships");
-			Debug.Log ("m_OverworldController.name: " + m_OverworldController.name);
 			bool repaired = m_OverworldController.GoToRepair ();
 			if (!repaired) {
 				StartEventDialogue (m_NotEnoughMoneyEventIndex);
 			}
 
+		} else if (message == "GetReward" && m_PlayerDataController != null) {
+			
+			int rewardValue;
+			int.TryParse (metadata, out rewardValue);
+
+			if (m_OverworldController != null) {//if in overworld we call earn gold so the overworld ui is updated
+				
+				m_OverworldController.EarnGold (rewardValue);
+
+			} else {//otherwise we go straight for the player data controller
+				
+				m_PlayerDataController.ChangePlayerGold (rewardValue);
+
+			}
+		} else if (message == "BuyShip" && m_OverworldController != null) {
+			string[] metadataArray = SplitMetadataString (metadata);
+			string shipType = metadataArray [0];
+			int shipCost;
+			int.TryParse (metadataArray [1], out shipCost);
+			bool boughtShip = m_OverworldController.BuyShip (shipType, shipCost);
+			if (boughtShip) {
+				StartEventDialogue (m_ThankYouEventIndex);
+			} else {
+				StartEventDialogue (m_NotEnoughMoneyEventIndex);
+			}
+
+		} else if (message == "GoToDialogue") {
+			int dialogueIndex;
+			int.TryParse (metadata, out dialogueIndex);
+			StartEventDialogue (dialogueIndex);
 		}
 	}
 
@@ -130,6 +169,12 @@ public class EventController : MonoBehaviour {
 
 	private void UnpauseGame(){
 		Time.timeScale = 1f;
+	}
+
+	private string[] SplitMetadataString(string metadata, char delimiter = ' ', int substringCount = 2){
+		char[] delimeterArray = { delimiter };
+		return metadata.Split (delimeterArray, substringCount);
+
 	}
 
 	/// <summary>

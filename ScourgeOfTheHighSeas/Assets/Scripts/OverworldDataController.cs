@@ -18,9 +18,11 @@ public class OverworldDataController : MonoBehaviour {
 	private List<int> m_PastEvents;
 	private LevelData m_CurrentLevelData;
 
-	private string m_LocationDataFile = "location_data_objects";
-	private string m_LevelDataFile = "level_data_objects";
-	private string m_EnemyShipFolderName = "EnemyShips";
+	private static string m_LocationDataFile = "location_data_objects";
+	private static string m_LevelDataFile = "level_data_objects";
+	private static string m_EnemyShipFolderName = "EnemyShips";
+
+	private static int m_NothingEventIndex = 1;
 
 	private int m_PlayerLocation;
 
@@ -133,6 +135,8 @@ public class OverworldDataController : MonoBehaviour {
 				locData.m_EventIndeces.Add (locEventIndex);
 				float eventProbability = float.Parse(locationEvent["EventProbability"].InnerText);
 				locData.m_EventsToProbabilities.Add (locEventIndex, eventProbability);
+				bool isUnique = bool.Parse (locationEvent.Attributes ["unique"].Value);
+				locData.m_EventsToUniqueness.Add (locEventIndex, isUnique);
 					
 
 			}
@@ -212,11 +216,19 @@ public class OverworldDataController : MonoBehaviour {
 	/// </summary>
 	/// <param name="locationIndex">Location index.</param>
 	public int GetRandomEventIndexAtLocation(int locationIndex){
-		
-		float dieRoll = Random.Range (0.0f, 1.0f);//first draw a random number to compare percentages to
-		float probabilitySum = 0.0f;
-		float eventProbability;
+
 		Dictionary<int,float> eventDictionary = m_LocationDataList [locationIndex].m_EventsToProbabilities;
+
+		float sumOfAllProbabilities = 0f;
+		float eventProbability;
+
+		foreach (int eventIndex in eventDictionary.Keys) {//we take the sum of all the probabilities of all events to be our range 
+			eventDictionary.TryGetValue (eventIndex, out eventProbability);
+			sumOfAllProbabilities += eventProbability;
+		}
+
+		float dieRoll = Random.Range (0.0f, sumOfAllProbabilities);//draw a random number within range to compare percentages to
+		float probabilitySum = 0.0f;
 
 		foreach (int eventIndex in eventDictionary.Keys) {//loop through events and their probabilities
 			
@@ -224,8 +236,23 @@ public class OverworldDataController : MonoBehaviour {
 			probabilitySum += eventProbability;//keep a running total of percentage of probability we have checked
 
 			if (dieRoll <= probabilitySum ) {//When the probability sum exceeds the die roll return the event we're up to
-				
-				return eventIndex;
+
+
+				Dictionary<int, bool> eventsToUniqueness =  m_LocationDataList[locationIndex].m_EventsToUniqueness; 
+				bool eventIsUnique;
+				eventsToUniqueness.TryGetValue (eventIndex, out eventIsUnique);
+
+				if (eventIsUnique) { //check if event is unique meaning it can only happen once
+					Debug.Log("encountered unique event");
+					if (m_PastEvents.Contains (eventIndex)) {//check if it already happened meaning we would return the nothing happens event
+						return m_NothingEventIndex;
+					} else {
+						m_PastEvents.Add (eventIndex);//if it hasn't happened we store it in the past events so it won't happen again
+						return eventIndex;
+					}
+				} else {
+					return eventIndex;
+				}
 
 			}
 		}

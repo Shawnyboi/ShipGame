@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
 
 	//These objects are everything the Gamemanager interacts with
 	private LevelManager m_CurrentLevelManager;
-	public OverworldController m_CurrentOverworldController;
+	private OverworldController m_CurrentOverworldController;
 	private OverworldDataController m_OverworldDataController;
 	private PlayerDataController m_PlayerDataController;
 
