@@ -28,10 +28,19 @@ public class OverworldController : MonoBehaviour {
 
 	public int m_RepairCost;
 
+	private Rect m_GoldBoxRect;
 	private int m_CurrentPlayerGold;
 
+	private int m_FleetViewerSceneIndex;
+
+
 	void Awake(){
+
+		m_GoldBoxRect = new Rect (Screen.width * .40f, Screen.height * .05f, Screen.width * .2f, Screen.height * .05f);
+
 		m_LocationSelected = false;
+		m_FleetViewerSceneIndex = 3;
+
 		if (m_EventController != null) {
 			m_EventController = null;
 		}		
@@ -66,7 +75,7 @@ public class OverworldController : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		GUI.Box (new Rect (Screen.width * .40f, Screen.height * .05f, Screen.width * .2f, Screen.height * .05f), "Booty: " + m_CurrentPlayerGold);
+		GUI.Box (m_GoldBoxRect, "Booty: " + m_CurrentPlayerGold);
 	}
 
 
@@ -104,6 +113,15 @@ public class OverworldController : MonoBehaviour {
 		m_LocationSelected = true;
 
 	}
+
+	/// <summary>
+	/// Sets the selected level index variable to the fleet viewer scene in order to cause the game manager to load it
+	/// </summary>
+	public void SetSelectedSceneToFleetViewer(){
+		m_SelectedLevelIndex = m_FleetViewerSceneIndex;
+		m_LocationSelected = true;
+	}
+
 	/// <summary>
 	/// Gets the index of the selected scene.
 	/// </summary>

@@ -12,16 +12,19 @@ public class GameManager : MonoBehaviour {
 	//These objects are everything the Gamemanager interacts with
 	private LevelManager m_CurrentLevelManager;
 	private OverworldController m_CurrentOverworldController;
+	private FleetViewerController m_CurrentFleetViewerController;
 	private OverworldDataController m_OverworldDataController;
 	private PlayerDataController m_PlayerDataController;
 
 	private string m_OverworldControllerTag;
+	private string m_FleetViewerControllerTag;
 
 	public LevelManager m_GenericLevelManagerPrefab;
 	//public OverworldController m_OverworldControllerPrefab;
 
-	//we need to know the overworld scene index as we will return to it many times
+	//we need to know the overworld scene index and fleet viewer scene index in order to access specific procedures for handling these scenes
 	private int m_OverworldSceneIndex;
+	private int m_FleetViewerSceneIndex;
 
 	void Awake (){
 		DontDestroyOnLoad (gameObject);// we want the game manager to stay around all the time
@@ -42,6 +45,8 @@ public class GameManager : MonoBehaviour {
 			gameDataController.Load (m_OverworldDataController, m_PlayerDataController);
 		}
 		m_OverworldSceneIndex = 1;
+		m_FleetViewerSceneIndex = 3;
+		m_FleetViewerControllerTag = "FleetViewerController";
 		m_OverworldControllerTag = "OverworldController";
 		GoToOverworld ();
 
@@ -57,6 +62,17 @@ public class GameManager : MonoBehaviour {
 		//See OnSceneFinishedLoading for additional logic that this causes
 
 	}
+
+	/// <summary>
+	/// Call this function to go to the fleet viewer
+	/// </summary>
+	private void GoToFleetViewer(){
+
+		SceneManager.LoadScene (m_FleetViewerSceneIndex);
+		//See OnSceneFinishedLoading for additional logic that this causes
+
+	}
+
 	/// <summary>
 	/// Call this function to go to a certain level
 	/// This will indirectly create the level manager
@@ -68,6 +84,7 @@ public class GameManager : MonoBehaviour {
 		//See OnSceneFinishedLoading for additional logic that this causes
 
 	}
+
 
 
 	/// <summary>
@@ -114,7 +131,7 @@ public class GameManager : MonoBehaviour {
 	/// When the level ends it takes the game back to the overworld;
 	/// </summary>
 	/// <returns>The loop.</returns>
-	public IEnumerator LevelLoop(){
+	private IEnumerator LevelLoop(){
 		
 		yield return StartCoroutine(m_CurrentLevelManager.BattleLoop());
 		LevelCleanup ();
@@ -128,11 +145,26 @@ public class GameManager : MonoBehaviour {
 	/// When selected it calls the go to level funcion for that level;
 	/// </summary>
 	/// <returns>The loop.</returns>
-	public IEnumerator OverworldLoop(){
+	private IEnumerator OverworldLoop(){
 		
-		m_CurrentOverworldController = GameObject.FindWithTag (m_OverworldControllerTag).GetComponent<OverworldController>();
 		yield return StartCoroutine (m_CurrentOverworldController.WaitForLocationSelection ());
-		GoToLevel (m_CurrentOverworldController.GetSelectedLevelSceneIndex ());
+
+		if (m_CurrentOverworldController.GetSelectedLevelSceneIndex () != m_FleetViewerSceneIndex) { // if the selected index is that of the fleet viewer we call a different function
+			GoToLevel (m_CurrentOverworldController.GetSelectedLevelSceneIndex ());
+		} else { 
+			GoToFleetViewer ();
+		}
+
+	}
+
+	/// <summary>
+	/// This coroutine starts the loop that waits for the player to leave the fleet viewer
+	/// Then it will return to the overworld
+	/// </summary>
+	/// <returns>The viewer loop.</returns>
+	private IEnumerator FleetViewerLoop(){
+		yield return StartCoroutine (m_CurrentFleetViewerController.WaitForFleetViewerToExit ());
+		GoToOverworld ();
 
 	}
 
@@ -169,11 +201,16 @@ public class GameManager : MonoBehaviour {
 	void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode){
 		
 		if (scene.buildIndex == m_OverworldSceneIndex) {//This means we went to the overworld
-			m_CurrentOverworldController = GameObject.FindGameObjectWithTag(m_OverworldControllerTag).GetComponent<OverworldController>();
+			m_CurrentOverworldController = GameObject.FindGameObjectWithTag (m_OverworldControllerTag).GetComponent<OverworldController> ();
 			m_CurrentOverworldController.m_OverworldDataController = m_OverworldDataController;
 			m_CurrentOverworldController.m_PlayerDataController = m_PlayerDataController;
 			StartCoroutine (OverworldLoop ());
 
+		}else if(scene.buildIndex == m_FleetViewerSceneIndex){ //this means we go to the fleet viewer
+			m_CurrentFleetViewerController = GameObject.FindGameObjectWithTag (m_FleetViewerControllerTag).GetComponent<FleetViewerController> ();
+			StartCoroutine (FleetViewerLoop ());
+
+		
 		} else {//This means we went to some other level
 			
 			m_CurrentLevelManager = Instantiate (m_GenericLevelManagerPrefab).GetComponent<LevelManager> ();
