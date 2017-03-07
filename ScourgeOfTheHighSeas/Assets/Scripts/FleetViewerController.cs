@@ -6,6 +6,7 @@ public class FleetViewerController : MonoBehaviour {
 
 	private PlayerDataController m_PlayerDataController;
 	private List<ShipAttributesData> m_ShipDataList;
+	private List<ShipUpgrade> m_UpgradeList;
 	private int m_CurrentSelectedShipIndex;
 	private GameObject m_CurrentSelectedShip;
 
@@ -27,6 +28,8 @@ public class FleetViewerController : MonoBehaviour {
 
 		m_PlayerDataController = GameObject.FindGameObjectWithTag ("PlayerDataController").GetComponent<PlayerDataController>();
 		m_ShipDataList = m_PlayerDataController.GetFleetData ();
+		m_UpgradeList = m_PlayerDataController.GetUpgradeData ();
+		Debug.Log ("m_UpgradeList in FleetViewerController has count " + m_UpgradeList.Count); 
 
 		m_CurrentSelectedShipIndex = 0;
 		DisplayShip (m_CurrentSelectedShipIndex);
@@ -119,6 +122,19 @@ public class FleetViewerController : MonoBehaviour {
 	/// <returns>The current ship attributes data.</returns>
 	public ShipAttributesData GetCurrentShipAttributes(){
 		return m_ShipDataList [m_CurrentSelectedShipIndex];
+	}
+
+	/// <summary>
+	/// Gets the list of ship upgrades in the current fleet viewerxc  
+	/// </summary>
+	/// <returns>The upgrade list.</returns>
+	public List<ShipUpgrade> GetUpgradeList(){
+		return m_UpgradeList;
+	}
+
+	public void ApplyUpgradeToCurrentShip(ShipUpgrade upgrade){
+		upgrade.AugmentShip (m_ShipDataList [m_CurrentSelectedShipIndex]);
+		DisplayShip (m_CurrentSelectedShipIndex);
 	}
 
 }

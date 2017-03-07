@@ -118,22 +118,42 @@ public class EventController : MonoBehaviour {
 				m_PlayerDataController.ChangePlayerGold (rewardValue);
 
 			}
+
 		} else if (message == "BuyShip" && m_OverworldController != null) {
+			
 			string[] metadataArray = SplitMetadataString (metadata);
 			string shipType = metadataArray [0];
 			int shipCost;
 			int.TryParse (metadataArray [1], out shipCost);
 			bool boughtShip = m_OverworldController.BuyShip (shipType, shipCost);
+
 			if (boughtShip) {
+				
 				StartEventDialogue (m_ThankYouEventIndex);
+
 			} else {
+				
 				StartEventDialogue (m_NotEnoughMoneyEventIndex);
+
 			}
 
+		}else if (message == "BuyUpgrade"){
+			
+			string[] metadataArray = SplitMetadataString (metadata);
+			string upgradeType = metadataArray [0];
+			int upgradeCost;
+			int.TryParse (metadataArray [1], out upgradeCost);
+			bool boughtUpgrade = m_OverworldController.BuyUpgrade (upgradeType, upgradeCost);
+
+
+
+		
 		} else if (message == "GoToDialogue") {
+			
 			int dialogueIndex;
 			int.TryParse (metadata, out dialogueIndex);
 			StartEventDialogue (dialogueIndex);
+
 		}
 	}
 

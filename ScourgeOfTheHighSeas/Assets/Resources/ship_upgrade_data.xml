@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ShipUpgrades>
+	<ShipUpgrade name="DamageBoost">
+		<DamageAugment>10</DamageAugment>
+		<MaxHullStrengthAugment>0</MaxHullStrengthAugment>
+		<SpeedAugment>0</SpeedAugment>
+		<RangeAugment>0</RangeAugment>
+		<ReloadTimeAugment>0</ReloadTimeAugment>
+	</ShipUpgrade>
+</ShipUpgrades>

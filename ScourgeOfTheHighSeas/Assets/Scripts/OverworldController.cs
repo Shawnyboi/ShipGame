@@ -144,6 +144,7 @@ public class OverworldController : MonoBehaviour {
 	/// </summary>
 	/// <param name="amount">Amount.</param>
 	public void EarnGold(int amount){
+		
 		m_PlayerDataController.ChangePlayerGold (amount);
 		m_CurrentPlayerGold = m_PlayerDataController.GetPlayerGold ();
 
@@ -152,18 +153,44 @@ public class OverworldController : MonoBehaviour {
 	/// <summary>
 	/// Gets called when the player buys a ship at the shop
 	/// adds the ship to the player fleet if the player has enough money
+    /// returns false if you don't have enough
 	/// </summary>
 	public bool BuyShip(string shipType, int shipCost){
+		
 		if (m_CurrentPlayerGold >= shipCost) {
+			
 			m_PlayerDataController.AddShipToFleet (shipType);
 			SpendGold (shipCost);
 			return true;
+
 		} else {
+			
 			return false;
+
 		}
-
-
 	}
+
+	/// <summary>
+	/// Gets called when a player buys an upgrade
+	/// adds the upgrade to the available upgrades if the player has enough funds
+	/// returns false if you don't have enough
+	/// </summary>
+	public bool BuyUpgrade(string upgradeType, int upgradeCost){
+
+		if (m_CurrentPlayerGold >= upgradeCost) {
+
+			m_PlayerDataController.AddUpgrade (upgradeType);
+			SpendGold (upgradeCost);
+			return true;
+
+		} else {
+			
+			return false;
+
+		}
+	}
+
+
 	/// <summary>
 	/// Gets called when the repair ships option is chosen at some location
 	/// </summary>

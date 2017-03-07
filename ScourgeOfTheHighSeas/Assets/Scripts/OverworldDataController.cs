@@ -110,7 +110,7 @@ public class OverworldDataController : MonoBehaviour {
 		XmlDocument xmlDocument = new XmlDocument ();
 		xmlDocument.LoadXml (locationDataFile.text);
 
-		//loop through elements of document and parse information
+		//get the xml file as a string and turn that into an "XmlDocument" Object
 		foreach (XmlNode location in xmlDocument["Locations"].ChildNodes) {
 
 			//each iteration will create a new location data object
@@ -262,7 +262,11 @@ public class OverworldDataController : MonoBehaviour {
 
 	}
 
-
+	/// <summary>
+	/// Creates the enemy ship array from level data.
+	/// This array is intended to be given to the level manager to spawn the enemy ships
+	/// </summary>
+	/// <returns>The enemy ship array from level data.</returns>
 	private GameObject[] CreateEnemyShipArrayFromLevelData(){
 		
 		if (m_CurrentLevelData == null) {

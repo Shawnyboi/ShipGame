@@ -18,13 +18,18 @@ public class GameDataController {
 
 	}
 
-
+	/// <summary>
+	/// Save the necesarry data for the player to be able to resume this game
+	/// </summary>
+	/// <param name="overworldDataController">Overworld data controller.</param>
+	/// <param name="playerDataController">Player data controller.</param>
 	public void Save(OverworldDataController overworldDataController, PlayerDataController playerDataController){
 		
 		m_GameData.m_PastEvents = overworldDataController.GetPastEvents ();
 		m_GameData.m_PlayerLocation = overworldDataController.GetPlayerLocation ();
 		m_GameData.m_PlayerFleet = playerDataController.GetFleetData ();
 		m_GameData.m_PlayerGold = playerDataController.GetPlayerGold ();
+		m_GameData.m_AvailableUpgrades = playerDataController.GetUpgradeData ();
 
 		BinaryFormatter binaryFormatter = new BinaryFormatter ();
 		FileStream file = File.Create (UnityEngine.Application.persistentDataPath + "/" + m_SaveFileName + ".dat");
@@ -34,6 +39,11 @@ public class GameDataController {
 
 	}
 
+	/// <summary>
+	/// Load the necesarry data for the player to resume the old game
+	/// </summary>
+	/// <param name="overworldDataController">Overworld data controller.</param>
+	/// <param name="playerDataController">Player data controller.</param>
 	public void Load(OverworldDataController overworldDataController, PlayerDataController playerDataController){
 		
 		if (File.Exists (UnityEngine.Application.persistentDataPath + "/" + m_SaveFileName + ".dat")) {
@@ -45,7 +55,7 @@ public class GameDataController {
 			m_GameData = savedData;
 
 			overworldDataController.PassInOverworldData (m_GameData.m_PlayerLocation, m_GameData.m_PastEvents);
-			playerDataController.PassInPlayerData (m_GameData.m_PlayerFleet, m_GameData.m_PlayerGold);
+			playerDataController.PassInPlayerData (m_GameData.m_PlayerFleet, m_GameData.m_PlayerGold, m_GameData.m_AvailableUpgrades);
 
 			file.Close ();
 

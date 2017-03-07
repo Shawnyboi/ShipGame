@@ -21,7 +21,10 @@ public class PlayerDataController : MonoBehaviour {
 
 	//the player fleet must be a list of easily copied and controlled structs so they can be saved and kept between scenes
 	private List<ShipAttributesData> m_PlayerFleet;
+	private List<ShipUpgrade> m_AvailableUpgrades;
 
+
+	//The amount of ingame currency the player currently has
 	private int m_PlayerGold;
 
 	void Awake () {
@@ -66,14 +69,23 @@ public class PlayerDataController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// A function to get the list of available ship upgrades
+	/// </summary>
+	/// <returns>The upgrade data.</returns>
+	public List<ShipUpgrade> GetUpgradeData(){
+		return m_AvailableUpgrades;
+	}
+
+	/// <summary>
 	/// Set the player fleet and player gold
 	/// Data should be coming in from a save file
 	/// </summary>
 	/// <param name="fleetData">Fleet data.</param>
 	/// <param name="playerGold">Player gold.</param>
-	public void PassInPlayerData(List<ShipAttributesData> fleetData, int playerGold){
+	public void PassInPlayerData(List<ShipAttributesData> fleetData, int playerGold, List<ShipUpgrade> availableUpgrades){
 		m_PlayerFleet = fleetData;
 		m_PlayerGold = playerGold;
+		m_AvailableUpgrades = availableUpgrades;
 	}
 
 	/// <summary>
@@ -130,6 +142,20 @@ public class PlayerDataController : MonoBehaviour {
 	public void RemoveShipsfromFleet(int index , int count){
 		m_PlayerFleet.RemoveRange(index, count);
 	}
+
+	/// <summary>
+	/// Adds the upgrade (passed in by name) to the players list of available upgrades
+	/// </summary>
+	public void AddUpgrade(string upgradeType){
+		
+		ShipUpgradeLoader upgradeLoader = new ShipUpgradeLoader ();
+		ShipUpgrade upgrade = upgradeLoader.GetUpgrade (upgradeType);
+		m_AvailableUpgrades.Add (upgrade);
+		Debug.Log ("UpgradeAdded in player data controller");
+
+	}
+
+
 	/// <summary>
 	/// Get the number of ships in the fleet
 	/// </summary>
@@ -155,6 +181,7 @@ public class PlayerDataController : MonoBehaviour {
 	/// <param name="saveIndex"> the index where the save file is held</param>
 	public void InitializePlayerDataController(bool newGame = true, int saveIndex = 0){
 		m_PlayerFleet = new List<ShipAttributesData> ();
+		m_AvailableUpgrades = new List<ShipUpgrade> ();
 
 		if (newGame) {
 			m_PlayerGold = m_StartingGold;
@@ -187,6 +214,6 @@ public class ShipAttributesData{
 	public float shotVarianceDegrees;
 	public float launchSpeed;
 	public string shipName;
-
+  
 }
 

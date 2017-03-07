@@ -9,12 +9,14 @@ public class FleetViewerUIController : MonoBehaviour {
 	private int m_ScreenWidth;
 	private int m_ScreenHeight;
 
-	private static Rect m_NextShipRect;
-	private static Rect m_PreviousShipRect;
-	private static Rect m_ExitButtonRect;
-	private static Rect m_ExitConfirmRect;
-	private static Rect m_ExitCancelRect;
-	private static Rect m_StatsRect;
+	private Rect m_NextShipRect;
+	private Rect m_PreviousShipRect;
+	private Rect m_ExitButtonRect;
+	private Rect m_ExitConfirmRect;
+	private Rect m_ExitCancelRect;
+	private Rect m_StatsRect;
+	private Rect m_UpgradeRect;
+	private Rect m_UpgradeButtonRect;
 
 	public float m_NextPreviousButtonPosX;
 	public float m_NextPreviousButtonPosY;
@@ -33,13 +35,23 @@ public class FleetViewerUIController : MonoBehaviour {
 	public float m_StatsWidth;
 	public float m_StatsHeight;
 
+	public float m_UpgradesPosX;
 
+	public float m_UpgradeButtonPosX;
+	public float m_UpgradeButtonPosY;
+	public float m_UpgradeButtonWidth;
+	public float m_UpgradeButtonHeight;
+	public Vector2 m_UpgradeButtonOffset;
+
+	private List<ShipUpgrade> m_ShipUpgradesList;
 	private ShipAttributesData m_CurrentShipStats;
 	private string m_CurrentShipStatsString;
 
 	private bool m_DisplayingExitPrompt;
 
 	void Awake(){
+
+
 		m_ScreenWidth = Screen.width;
 		m_ScreenHeight = Screen.height;
 
@@ -58,35 +70,76 @@ public class FleetViewerUIController : MonoBehaviour {
 		m_ExitCancelRect.y += m_ExitOptionsOffset * m_ScreenHeight;
 
 		m_StatsRect = new Rect(m_ScreenWidth * m_StatsPosX, m_ScreenHeight * m_StatsPosY, m_ScreenWidth * m_StatsWidth,  m_ScreenHeight * m_StatsHeight);
+		m_UpgradeRect = new Rect(m_ScreenWidth * m_UpgradesPosX, m_ScreenHeight * m_StatsPosY, m_ScreenWidth * m_StatsWidth,  m_ScreenHeight * m_StatsHeight);
+		m_UpgradeButtonRect = new Rect (m_ScreenWidth * m_UpgradeButtonPosX, m_ScreenHeight * m_UpgradeButtonPosY, m_UpgradeButtonWidth * m_ScreenWidth, m_UpgradeButtonHeight * m_ScreenHeight);
+
+	}
+
+	void Start(){
+		m_CurrentShipStats = m_FleetViewerController.GetCurrentShipAttributes ();
+		m_ShipUpgradesList = m_FleetViewerController.GetUpgradeList ();
+
+		m_CurrentShipStatsString = ShipAttributesDataToString (m_CurrentShipStats);
+
 
 	}
 
 	void OnGUI(){
+		
 		GUI.Box (m_StatsRect, m_CurrentShipStatsString);
 
+		for (int i = 0; i < m_ShipUpgradesList.Count; i++) {
+			if (GUI.Button (OffsetRect(m_UpgradeButtonRect, m_UpgradeButtonOffset * i), m_ShipUpgradesList[i].name)) {
+				
+				m_FleetViewerController.ApplyUpgradeToCurrentShip (m_ShipUpgradesList [i]);
+				m_ShipUpgradesList.RemoveAt (i);
+				break;
+			}
+		}
+
+		GUI.Box (m_UpgradeRect, "Available Upgrades");
+
 		if (GUI.Button (m_NextShipRect, "Next Ship")) {
+			
 			OnNextShipButton ();
+
 		}
 
 		if (GUI.Button (m_PreviousShipRect, "Previous Ship")) {
+			
 			OnPreviousShipButton ();
+
 		}
 		if (!m_DisplayingExitPrompt) {
+			
 			if (GUI.Button (m_ExitButtonRect, "Exit")) {
+				
 				m_DisplayingExitPrompt = true;
+
 			}
+
 		} else {
+			
 			GUI.Box (m_ExitButtonRect, "Return To OverWorld?");
+
 			if (GUI.Button (m_ExitConfirmRect, "Yes")) {
+				
 				m_FleetViewerController.ExitFleetViewer ();
+
 			}
+
 			if (GUI.Button (m_ExitCancelRect, "No")){
+				
 				m_DisplayingExitPrompt = false;
 			}
 		}
 	}
 
-	private string ShipAttributesDataToString(ShipAttributesData shipStats){
+	/// <summary>
+	/// Converts a ship attribute data object to an easily understandable string form
+	/// </summary>
+		private string ShipAttributesDataToString(ShipAttributesData shipStats){
+		
 		return "Ship Stats: " + "\n"
 			+"Type: " + shipStats.shipName + "\n" 
 			+ "Hull Strength: " + shipStats.currentHullStrength + " / " + shipStats.maxHullStrength + "\n"
@@ -101,6 +154,7 @@ public class FleetViewerUIController : MonoBehaviour {
 	/// It tells the fleet viewer controller to go to next ship and it displays that ships stats
 	/// </summary>
 	private void OnNextShipButton(){
+		
 		m_FleetViewerController.GoToNextShip ();
 		m_CurrentShipStats = m_FleetViewerController.GetCurrentShipAttributes ();
 		m_CurrentShipStatsString = ShipAttributesDataToString (m_CurrentShipStats);
@@ -112,12 +166,23 @@ public class FleetViewerUIController : MonoBehaviour {
 	/// It tells the fleet viewer controller to go to previous ship and it displays that ships stats
 	/// </summary>
 	private void OnPreviousShipButton(){
+		
 		m_FleetViewerController.GoToPreviousShip ();
 		m_CurrentShipStats = m_FleetViewerController.GetCurrentShipAttributes ();
 		m_CurrentShipStatsString = ShipAttributesDataToString (m_CurrentShipStats);
 
 	}
 
+	/// <summary>
+	/// Takes an input rect and an offset(in units of fraction of screen space) and returns the new offset rect
+	/// </summary>
+	/// <returns>The rect.</returns>
+	/// <param name="inputRect">Input rect.</param>
+	/// <param name="offset">Offset (in units of fraction of screen space).</param>
+	private Rect OffsetRect(Rect inputRect, Vector2 offset){	
+		Vector2 actualOffset = new Vector2 (offset.x * m_ScreenWidth, offset.y * m_ScreenHeight);
+		return new Rect (inputRect.x + actualOffset.x, inputRect.y + actualOffset.y, inputRect.width, inputRect.height);
+	}
 
 
 

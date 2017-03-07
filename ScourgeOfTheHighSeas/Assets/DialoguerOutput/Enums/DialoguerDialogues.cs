@@ -11,4 +11,5 @@ public enum DialoguerDialogues{
 	FoundSunkenTreasure = 7,
 	GenericShipStore = 8,
 	Thank_you = 9,
+	GenericUpgradeStore = 10,
 }
