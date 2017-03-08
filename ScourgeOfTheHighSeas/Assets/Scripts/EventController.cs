@@ -88,74 +88,138 @@ public class EventController : MonoBehaviour {
 	/// Not the message event is part of the dialoguer system itself
 	/// </summary>
 	private void ReadMessageEvent(string message, string metadata){
-		
+
+		//the message tells us what kind of event it is, the metadata tells us details about the event
 		Debug.Log ("Message Event: " + message);
 		Debug.Log ("Metadata: " + metadata);
 
-		if (message == "GoToLevel" && m_OverworldController != null) {//this tells us we are in the overworld and we want to begin a level
+		if (message == "GoToLevel" && m_OverworldController != null) {//this tells us we are in the overworld and we want to begin a level		
 			
-			int levelSceneIndex;
-			int.TryParse (metadata, out levelSceneIndex);
-			m_OverworldController.SetSelectedLevelSceneIndex (levelSceneIndex);
+			GoToLevel(metadata);
 
-		} else if (message == "RepairShips" && m_OverworldController != null) {
-			bool repaired = m_OverworldController.GoToRepair ();
-			if (!repaired) {
-				StartEventDialogue (m_NotEnoughMoneyEventIndex);
-			}
+		} else if (message == "RepairShips" && m_OverworldController != null) {//we are in the overworld and we are trying to repair ships
 
-		} else if (message == "GetReward" && m_PlayerDataController != null) {
+			RepairShips (metadata);
+
+		} else if (message == "GetReward" && m_PlayerDataController != null) {//we are getting a reward, the player data controller shouldn't be null but just in case we check
 			
-			int rewardValue;
-			int.TryParse (metadata, out rewardValue);
+			GetReward (metadata);
 
-			if (m_OverworldController != null) {//if in overworld we call earn gold so the overworld ui is updated
-				
-				m_OverworldController.EarnGold (rewardValue);
-
-			} else {//otherwise we go straight for the player data controller
-				
-				m_PlayerDataController.ChangePlayerGold (rewardValue);
-
-			}
-
-		} else if (message == "BuyShip" && m_OverworldController != null) {
+		} else if (message == "BuyShip" && m_OverworldController != null) {//we are in the overworld and buying a ship
 			
-			string[] metadataArray = SplitMetadataString (metadata);
-			string shipType = metadataArray [0];
-			int shipCost;
-			int.TryParse (metadataArray [1], out shipCost);
-			bool boughtShip = m_OverworldController.BuyShip (shipType, shipCost);
+			BuyShip (metadata);
 
-			if (boughtShip) {
-				
-				StartEventDialogue (m_ThankYouEventIndex);
-
-			} else {
-				
-				StartEventDialogue (m_NotEnoughMoneyEventIndex);
-
-			}
-
-		}else if (message == "BuyUpgrade"){
+		}else if (message == "BuyUpgrade" && m_OverworldController != null){//we are in the overworld and buying an upgrade
 			
-			string[] metadataArray = SplitMetadataString (metadata);
-			string upgradeType = metadataArray [0];
-			int upgradeCost;
-			int.TryParse (metadataArray [1], out upgradeCost);
-			bool boughtUpgrade = m_OverworldController.BuyUpgrade (upgradeType, upgradeCost);
-
-
-
+			BuyUpgrade (metadata);
 		
-		} else if (message == "GoToDialogue") {
-			
-			int dialogueIndex;
-			int.TryParse (metadata, out dialogueIndex);
-			StartEventDialogue (dialogueIndex);
+		} else if (message == "GoToDialogue") {//we want to switch which dialogue we are in
+
+			GoToDialogue (metadata);
 
 		}
 	}
+
+	/// <summary>
+	/// Repairs the ships if we can afford it
+	/// </summary>
+	private void RepairShips(string metadata){
+
+		bool repaired = m_OverworldController.GoToRepair ();
+		if (!repaired) {
+			StartEventDialogue (m_NotEnoughMoneyEventIndex);
+		}
+
+	}
+
+	/// <summary>
+	/// Tells the overworld controller which level to go to
+	/// </summary>
+	private void GoToLevel(string metadata){
+		
+		int levelSceneIndex;
+		int.TryParse (metadata, out levelSceneIndex);
+		m_OverworldController.SetSelectedLevelSceneIndex (levelSceneIndex);
+
+	}
+
+	/// <summary>
+	/// Adds money (amt specified by metadata) to the players booty
+	/// </summary>
+	private void GetReward(string metadata){
+
+		int rewardValue;
+		int.TryParse (metadata, out rewardValue);
+
+		if (m_OverworldController != null) {//if in overworld we call earn gold so the overworld ui is updated
+
+			m_OverworldController.EarnGold (rewardValue);
+
+		} else {//otherwise we go straight for the player data controller
+
+			m_PlayerDataController.ChangePlayerGold (rewardValue);
+
+		}
+
+	}
+
+	/// <summary>
+	/// Changes dialoguer dialogue tree currently being played out(dialoguer index specified by metadata
+	/// </summary>
+	private void GoToDialogue(string metadata){
+		
+		int dialogueIndex;
+		int.TryParse (metadata, out dialogueIndex);
+		StartEventDialogue (dialogueIndex);
+
+	}
+
+	/// <summary>
+	/// Buys a certain ship if we can afford it and puts it in the player fleet (ship type and cost specified by the metadata)
+	/// </summary>
+	private void BuyShip(string metadata){
+		
+		string[] metadataArray = SplitMetadataString (metadata);
+		string shipType = metadataArray [0];
+		int shipCost;
+		int.TryParse (metadataArray [1], out shipCost);
+		bool boughtShip = m_OverworldController.BuyShip (shipType, shipCost);
+
+		if (boughtShip) {
+
+			StartEventDialogue (m_ThankYouEventIndex);
+
+		} else {
+
+			StartEventDialogue (m_NotEnoughMoneyEventIndex);
+
+		}
+
+	}
+
+	/// <summary>
+	/// Buys an upgrade if we can afford it and puts it in the players available upgrades.
+	/// </summary>
+	private void BuyUpgrade(string metadata){
+		
+		string[] metadataArray = SplitMetadataString (metadata);
+		string upgradeType = metadataArray [0];
+		int upgradeCost;
+		int.TryParse (metadataArray [1], out upgradeCost);
+		bool boughtUpgrade = m_OverworldController.BuyUpgrade (upgradeType, upgradeCost);
+
+		if (boughtUpgrade) {
+
+			StartEventDialogue (m_ThankYouEventIndex);
+
+		} else {
+
+			StartEventDialogue (m_NotEnoughMoneyEventIndex);
+
+		}
+
+	}
+
 
 	/// <summary>
 	/// execute code when a dialoguer dialogue begins

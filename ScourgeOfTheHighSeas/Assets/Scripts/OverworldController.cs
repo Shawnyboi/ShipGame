@@ -207,6 +207,14 @@ public class OverworldController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Save the game.
+	/// </summary>
+	public void Save(){
+		GameDataController gameDataController = new GameDataController ();
+		gameDataController.Save (m_OverworldDataController, m_PlayerDataController);
+	}
+
+	/// <summary>
 	/// Updates the position where the player's location sprite is rendered on the screen,
 	/// We want to put it where the button the player is at is rendered
 	/// </summary>

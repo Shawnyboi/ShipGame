@@ -9,38 +9,15 @@ public class FleetViewerUIController : MonoBehaviour {
 	private int m_ScreenWidth;
 	private int m_ScreenHeight;
 
-	private Rect m_NextShipRect;
-	private Rect m_PreviousShipRect;
-	private Rect m_ExitButtonRect;
-	private Rect m_ExitConfirmRect;
-	private Rect m_ExitCancelRect;
-	private Rect m_StatsRect;
-	private Rect m_UpgradeRect;
-	private Rect m_UpgradeButtonRect;
+	[SerializeField] private Rect m_NextShipRect;
+	[SerializeField] private Rect m_PreviousShipRect;
+	[SerializeField] private Rect m_ExitButtonRect;
+	[SerializeField] private Rect m_ExitConfirmRect;
+	[SerializeField] private Rect m_ExitCancelRect;
+	[SerializeField] private Rect m_StatsRect;
+	[SerializeField] private Rect m_UpgradeRect;
+	[SerializeField] private Rect m_UpgradeButtonRect;
 
-	public float m_NextPreviousButtonPosX;
-	public float m_NextPreviousButtonPosY;
-	public float m_NextPreviousButtonWidth;
-	public float m_NextPreviousButtonHeight;
-	public float m_NextPreviousButtonOffset;
-
-	public float m_ExitButtonPosX;
-	public float m_ExitButtonPosY;
-	public float m_ExitButtonWidth;
-	public float m_ExitButtonHeight;
-	public float m_ExitOptionsOffset;
-
-	public float m_StatsPosX;
-	public float m_StatsPosY;
-	public float m_StatsWidth;
-	public float m_StatsHeight;
-
-	public float m_UpgradesPosX;
-
-	public float m_UpgradeButtonPosX;
-	public float m_UpgradeButtonPosY;
-	public float m_UpgradeButtonWidth;
-	public float m_UpgradeButtonHeight;
 	public Vector2 m_UpgradeButtonOffset;
 
 	private List<ShipUpgrade> m_ShipUpgradesList;
@@ -58,20 +35,14 @@ public class FleetViewerUIController : MonoBehaviour {
 
 		m_DisplayingExitPrompt = false;
 
-		m_NextShipRect = new Rect (m_ScreenWidth * m_NextPreviousButtonPosX, m_ScreenHeight * m_NextPreviousButtonPosY, m_ScreenWidth * m_NextPreviousButtonWidth, m_ScreenHeight * m_NextPreviousButtonHeight);
-		m_PreviousShipRect = new Rect (m_ScreenWidth * (m_NextPreviousButtonPosX + m_NextPreviousButtonOffset), m_ScreenHeight * m_NextPreviousButtonPosY, m_ScreenWidth * m_NextPreviousButtonWidth, m_ScreenHeight * m_NextPreviousButtonHeight);
-
-		m_ExitButtonRect = new Rect (m_ScreenWidth * m_ExitButtonPosX, m_ScreenHeight * m_ExitButtonPosY, m_ScreenWidth * m_ExitButtonWidth, m_ScreenHeight * m_ExitButtonHeight);
-
-		m_ExitConfirmRect = m_ExitButtonRect;
-		m_ExitConfirmRect.y += m_ExitOptionsOffset * m_ScreenHeight;
-
-		m_ExitCancelRect = m_ExitConfirmRect;
-		m_ExitCancelRect.y += m_ExitOptionsOffset * m_ScreenHeight;
-
-		m_StatsRect = new Rect(m_ScreenWidth * m_StatsPosX, m_ScreenHeight * m_StatsPosY, m_ScreenWidth * m_StatsWidth,  m_ScreenHeight * m_StatsHeight);
-		m_UpgradeRect = new Rect(m_ScreenWidth * m_UpgradesPosX, m_ScreenHeight * m_StatsPosY, m_ScreenWidth * m_StatsWidth,  m_ScreenHeight * m_StatsHeight);
-		m_UpgradeButtonRect = new Rect (m_ScreenWidth * m_UpgradeButtonPosX, m_ScreenHeight * m_UpgradeButtonPosY, m_UpgradeButtonWidth * m_ScreenWidth, m_UpgradeButtonHeight * m_ScreenHeight);
+		m_NextShipRect = RectScreenFractionToPixels (m_NextShipRect);
+		m_PreviousShipRect = RectScreenFractionToPixels (m_PreviousShipRect);
+		m_ExitButtonRect = RectScreenFractionToPixels (m_ExitButtonRect);
+		m_ExitConfirmRect = RectScreenFractionToPixels (m_ExitConfirmRect);
+		m_ExitCancelRect = RectScreenFractionToPixels (m_ExitCancelRect);
+		m_StatsRect = RectScreenFractionToPixels (m_StatsRect);
+		m_UpgradeRect = RectScreenFractionToPixels (m_UpgradeRect);
+		m_UpgradeButtonRect = RectScreenFractionToPixels (m_UpgradeButtonRect);
 
 	}
 
@@ -89,11 +60,15 @@ public class FleetViewerUIController : MonoBehaviour {
 		GUI.Box (m_StatsRect, m_CurrentShipStatsString);
 
 		for (int i = 0; i < m_ShipUpgradesList.Count; i++) {
+			
 			if (GUI.Button (OffsetRect(m_UpgradeButtonRect, m_UpgradeButtonOffset * i), m_ShipUpgradesList[i].name)) {
 				
 				m_FleetViewerController.ApplyUpgradeToCurrentShip (m_ShipUpgradesList [i]);
 				m_ShipUpgradesList.RemoveAt (i);
+				m_CurrentShipStats = m_FleetViewerController.GetCurrentShipAttributes ();
+				m_CurrentShipStatsString = ShipAttributesDataToString (m_CurrentShipStats);
 				break;
+
 			}
 		}
 
@@ -174,14 +149,27 @@ public class FleetViewerUIController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Takes an input rect and an offset(in units of fraction of screen space) and returns the new offset rect
+	/// Takes an input rect(in pixel units) and an offset(in units of fraction of screen space) and returns the new offset rect
 	/// </summary>
 	/// <returns>The rect.</returns>
 	/// <param name="inputRect">Input rect.</param>
 	/// <param name="offset">Offset (in units of fraction of screen space).</param>
 	private Rect OffsetRect(Rect inputRect, Vector2 offset){	
+		
 		Vector2 actualOffset = new Vector2 (offset.x * m_ScreenWidth, offset.y * m_ScreenHeight);
 		return new Rect (inputRect.x + actualOffset.x, inputRect.y + actualOffset.y, inputRect.width, inputRect.height);
+
+	}
+
+	/// <summary>
+	/// Converts a Rect from units of a fraction of screen space to pixel coordinates
+	/// </summary>
+	/// <returns>The rect in pixel space.</returns>
+	/// <param name="inputRect">Input rect.</param>
+	private Rect RectScreenFractionToPixels(Rect inputRect){
+		
+		return new Rect (inputRect.x * m_ScreenWidth, inputRect.y * m_ScreenHeight, inputRect.width * m_ScreenWidth, inputRect.height * m_ScreenHeight);
+
 	}
 
 

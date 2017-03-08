@@ -19,6 +19,7 @@ public class FleetViewerController : MonoBehaviour {
 	private Quaternion m_ShipRotation;
 
 	private bool m_ExittingFleetViewer;
+	private bool m_DisplayingShip;
 
 	void Awake(){
 		m_ExittingFleetViewer = false;
@@ -32,7 +33,11 @@ public class FleetViewerController : MonoBehaviour {
 		Debug.Log ("m_UpgradeList in FleetViewerController has count " + m_UpgradeList.Count); 
 
 		m_CurrentSelectedShipIndex = 0;
-		DisplayShip (m_CurrentSelectedShipIndex);
+		m_DisplayingShip = false;
+
+		if (!m_DisplayingShip) {
+			StartCoroutine (DisplayShip (m_CurrentSelectedShipIndex));
+		}
 
 
 
@@ -54,8 +59,9 @@ public class FleetViewerController : MonoBehaviour {
 
 		}
 
-		DisplayShip (m_CurrentSelectedShipIndex);
-
+		if (!m_DisplayingShip) {
+			StartCoroutine (DisplayShip (m_CurrentSelectedShipIndex));
+		}
 	}
 
 	/// <summary>
@@ -74,25 +80,34 @@ public class FleetViewerController : MonoBehaviour {
 
 		}
 
-		DisplayShip (m_CurrentSelectedShipIndex);
-
+		if (!m_DisplayingShip) {
+			StartCoroutine (DisplayShip (m_CurrentSelectedShipIndex));
+		}
 
 	}
 		
-
 	/// <summary>
-	/// This function instatntiates the ship in  the ship data list referred to by the ship index
+	/// This coroutine instantiates the ship in  the ship data list referred to by the ship index
 	/// it will also remove the current selected ship and store the new ship's pointer in m_CurrentSelectedShip
 	/// </summary>
 	/// <param name="shipIndex">Ship index.</param>
-	private void DisplayShip(int shipIndex){
+	private IEnumerator DisplayShip(int shipIndex){
+		m_DisplayingShip = true;
 		if (m_CurrentSelectedShip != null) {
+
 			Destroy (m_CurrentSelectedShip);
+
+			yield return new WaitForSeconds (.2f); //if we are switching ships we wait a second before displaying it
+
 		}
 		m_CurrentSelectedShip = Instantiate (Resources.Load(m_ShipFolderName + "/" + m_ShipDataList [shipIndex].shipName), m_ShipPosition, m_ShipRotation) as GameObject;
 		ShipStatusController currentShipStatusController = m_CurrentSelectedShip.GetComponent<ShipStatusController> ();
 		currentShipStatusController.m_LifebarCanvas.enabled = false;
+		m_DisplayingShip = false;
+		yield return null;
+
 	}
+
 
 	/// <summary>
 	/// Call this function to go back to overworld by ending the FleetViewerLoop Coroutine in the game manager
@@ -132,6 +147,9 @@ public class FleetViewerController : MonoBehaviour {
 		return m_UpgradeList;
 	}
 
+	/// <summary>
+	/// Takes a ship upgrade object and it apllies it to the ship currently being looked at in the fleet viewer
+	/// </summary>
 	public void ApplyUpgradeToCurrentShip(ShipUpgrade upgrade){
 		upgrade.AugmentShip (m_ShipDataList [m_CurrentSelectedShipIndex]);
 		DisplayShip (m_CurrentSelectedShipIndex);

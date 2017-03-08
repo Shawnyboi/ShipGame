@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 /// <summary>
 /// This is class is going to contain the necesarry information for a ship upgrade 
 /// The player should be able to hold onto this object (in the player data controller) 
 /// and apply it to a ship in the fleet viewer
 /// </summary>
+
+[Serializable]
 public class ShipUpgrade {
 	private readonly float m_SpeedAugment;
 	private readonly float m_MaxHullStrengthAugment;
