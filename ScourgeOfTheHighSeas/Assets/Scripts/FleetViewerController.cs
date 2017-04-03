@@ -149,10 +149,15 @@ public class FleetViewerController : MonoBehaviour {
 
 	/// <summary>
 	/// Takes a ship upgrade object and it apllies it to the ship currently being looked at in the fleet viewer
+	/// returns false if upgrade is not able to be applied
 	/// </summary>
-	public void ApplyUpgradeToCurrentShip(ShipUpgrade upgrade){
-		upgrade.AugmentShip (m_ShipDataList [m_CurrentSelectedShipIndex]);
-		DisplayShip (m_CurrentSelectedShipIndex);
+	public bool ApplyUpgradeToCurrentShip(ShipUpgrade upgrade){
+		if (upgrade.AugmentShip (m_ShipDataList [m_CurrentSelectedShipIndex])) {
+			DisplayShip (m_CurrentSelectedShipIndex);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

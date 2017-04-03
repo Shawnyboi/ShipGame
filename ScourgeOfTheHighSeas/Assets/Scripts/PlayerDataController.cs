@@ -15,7 +15,7 @@ public class PlayerDataController : MonoBehaviour {
 	private string m_ShipFolderName = "Ships";
 	private string m_StarterShipName = "Ship";
 	private int m_StarterFleetSize = 3;
-	private int m_StartingGold = 100;
+	private int m_StartingGold = 1000;
 
 
 
@@ -214,6 +214,11 @@ public class ShipAttributesData{
 	public float shotVarianceDegrees;
 	public float launchSpeed;
 	public string shipName;
+	public List<string> upgradeList;
+
+	public ShipAttributesData(){
+		upgradeList = new List<string> ();
+	}
   
 }
 

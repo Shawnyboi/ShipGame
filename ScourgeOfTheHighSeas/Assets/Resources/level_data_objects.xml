@@ -9,6 +9,8 @@
 			<Enemy>EnemyShip</Enemy>
 			<Enemy>EnemyShip</Enemy>
 			<Enemy>EnemyFrontFireShip</Enemy>
+			<Enemy>EnemyBombShip</Enemy>
+			<Enemy>EnemyFlamethrowerShip</Enemy>
 		</Enemies>
 		<Events>
 			<Event>

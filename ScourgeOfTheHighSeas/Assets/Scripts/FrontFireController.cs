@@ -9,6 +9,13 @@ using UnityEngine;
 public class FrontFireController : ShipFireController {
 
 	public Transform[] m_BowFirePositions;
+	protected Vector3 m_GravityVector;
+
+
+	override protected void Awake(){
+		base.Awake ();
+		m_GravityVector = Physics.gravity;
+	}
 
 	/// <summary>
 	/// This overrides the original fire function so that the ship only fires from the bow
@@ -38,7 +45,7 @@ public class FrontFireController : ShipFireController {
 
 		if(Vector3.Distance(m_Transform.position, targetPosition) < m_Range){
 
-			if (!m_Cannonball.GetComponent<CannonballController> ().m_IsAlive) {
+			if (!m_CannonballController.m_IsAlive) {
 
 				LaunchCannonball (firePosition, targetPosition);
 
@@ -54,11 +61,11 @@ public class FrontFireController : ShipFireController {
 		Debug.Log ("targetPosition: "+ targetPosition);
 		m_Cannonball.SetActive (true);
 		m_Cannonball.transform.position = firePosition;
-		m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
-		m_Cannonball.GetComponent<CannonballController> ().SetEnemyLayer (m_EnemyTeamMask);
-		StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
+		m_CannonballController.GiveDamageAmount (m_Damage);
+		m_CannonballController.SetEnemyLayer (m_EnemyTeamMask);
+		StartCoroutine (m_CannonballController.BeginLifeTime ());
 		m_CannonFireSound.Play ();
-		m_Cannonball.GetComponent<Rigidbody> ().velocity = calculateBallisticVelocity(firePosition, targetPosition);
+		m_CannonballRigidbody.velocity = calculateBallisticVelocity(firePosition, targetPosition);
 
 
 	}
@@ -70,7 +77,8 @@ public class FrontFireController : ShipFireController {
 		float horizontalDistance = Vector3.Magnitude (horizontalProjection);
 		float timeOfFlight = horizontalDistance / m_LaunchSpeed; //this part is unrealistic but should make it look nicer, the time of flight is determined as if it was just flying straight at the launch speed
 		Vector3 horizontalVelocity = Vector3.Normalize(horizontalProjection) * m_LaunchSpeed;
-		Vector3 verticalVelocity = new Vector3 (0f, 1f, 0f) * Physics.gravity.y * timeOfFlight / 2f;
+		float verticalDistance = fromFireToTarget.y;
+		Vector3 verticalVelocity = new Vector3 (0f, 1f, 0f) * (Physics.gravity.y * timeOfFlight / 2f - verticalDistance/timeOfFlight);
 		return horizontalVelocity - verticalVelocity;
 	}
 

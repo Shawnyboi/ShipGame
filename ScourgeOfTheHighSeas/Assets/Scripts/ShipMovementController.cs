@@ -43,6 +43,7 @@ public class ShipMovementController : MonoBehaviour {
 		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_Rigidbody = GetComponent<Rigidbody> ();
 		m_ShipFireController = GetComponent<ShipFireController> ();
+
 		m_CurrentDestination = m_Transform.position;
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
@@ -58,14 +59,6 @@ public class ShipMovementController : MonoBehaviour {
 		m_ShipSpeed = m_ShipAttributes.m_Speed;
 		m_ShipTurningSpeed = m_ShipAttributes.m_TurningSpeed;
 		m_StunBlockTime = m_ShipAttributes.m_StunBlockTime;
-
-	}
-
-
-
-	// Update is called once per frame
-	void Update () {
-		
 
 	}
 
@@ -168,7 +161,8 @@ public class ShipMovementController : MonoBehaviour {
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
 	}
-		
+
+	/*
 	//For when the ship bumps into another ship it will become stun blocked and not be able to move for some time
 	public IEnumerator StunBlock(Collider blockerCollider){
 
@@ -182,6 +176,7 @@ public class ShipMovementController : MonoBehaviour {
 
 		}
 	}
+	*/
 
 	/// <summary>
 	/// This coroutine will handle the turning concurrently to the movement in order to make it look smoother

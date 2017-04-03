@@ -8,8 +8,12 @@ public class ShipFireController : MonoBehaviour {
 	public Transform[] m_StarboardFirePositions;
 
 	protected ShipAttributes m_ShipAttributes;
+	protected ShipMovementController m_ShipMovementController;
 
 	public GameObject m_Cannonball;
+	protected CannonballController m_CannonballController;
+	protected Rigidbody m_CannonballRigidbody;
+
 	protected float m_Range;
 	protected float m_Damage;
 	protected float m_ReloadTime;
@@ -29,9 +33,12 @@ public class ShipFireController : MonoBehaviour {
 	virtual protected void Awake(){
 		m_Transform = gameObject.GetComponent<Transform> ();
 		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
+		m_ShipMovementController = gameObject.GetComponent<ShipMovementController> ();
 		m_Disposition = "aggressive";
 		m_Attacking = false;
 		m_Cannonball = Instantiate (m_Cannonball);
+		m_CannonballController = m_Cannonball.GetComponent<CannonballController> ();
+		m_CannonballRigidbody = m_Cannonball.GetComponent<Rigidbody> ();
 		m_Cannonball.SetActive (false);
 
 
@@ -111,13 +118,13 @@ public class ShipFireController : MonoBehaviour {
 					
 					SetNewTarget(enemyCollidersInRange [0].gameObject);//if there is at least one get the first one detected and set it as this objects target
 
-					if (m_Disposition == "aggressive" && !gameObject.GetComponent<ShipMovementController> ().HasCommandedDestination ()) {
+					if (m_Disposition == "aggressive" && !m_ShipMovementController.HasCommandedDestination ()) {
 						
-						StartCoroutine (gameObject.GetComponent<ShipMovementController> ().TrackTarget ()); //if we are in the agressive diposition we go after the target
+						StartCoroutine (m_ShipMovementController.TrackTarget ()); //if we are in the agressive diposition we go after the target
 
-					} else if (m_Disposition == "defensive" && !gameObject.GetComponent<ShipMovementController> ().HasCommandedDestination ()) {
+					} else if (m_Disposition == "defensive" && !m_ShipMovementController.HasCommandedDestination ()) {
 
-						StartCoroutine (gameObject.GetComponent<ShipMovementController> ().DefensiveTracking ()); //if we are defensive just track the target wthout moving
+						StartCoroutine (m_ShipMovementController.DefensiveTracking ()); //if we are defensive just track the target wthout moving
 
 					}
 				}
@@ -167,15 +174,15 @@ public class ShipFireController : MonoBehaviour {
 		//fire the cannonball
 		if(Vector3.Distance(m_Transform.position, targetPosition) < m_Range){
 			
-			if (!m_Cannonball.GetComponent<CannonballController> ().m_IsAlive) {
+			if (!m_CannonballController.m_IsAlive) {
 
 				LaunchCannonball (firePosition, targetPosition);
 
 				return true;
 			}
-			return false; //Target not within range
+			return false; //Cannonball already fired and isn't gone yet
 		}
-		return false; //Cannonball already fired and isn't gone yet
+		return false; //Target not within range
 	}
 
 	/// <summary>
@@ -187,13 +194,13 @@ public class ShipFireController : MonoBehaviour {
 
 		m_Cannonball.SetActive (true);
 		m_Cannonball.transform.position = firePosition;
-		m_Cannonball.GetComponent<CannonballController> ().GiveDamageAmount (m_Damage);
-		m_Cannonball.GetComponent<CannonballController> ().SetEnemyLayer (m_EnemyTeamMask);
-		StartCoroutine (m_Cannonball.GetComponent<CannonballController> ().BeginLifeTime ());
+		m_CannonballController.GiveDamageAmount (m_Damage);
+		m_CannonballController.SetEnemyLayer (m_EnemyTeamMask);
+		StartCoroutine (m_CannonballController.BeginLifeTime ());
 		Vector3 trajectory = CalculateTrajectory (targetPosition, firePosition);
 		trajectory = VariateTrajectory (trajectory);
 		m_CannonFireSound.Play ();
-		m_Cannonball.GetComponent<Rigidbody> ().velocity = m_LaunchSpeed * trajectory;
+		m_CannonballRigidbody.velocity = m_LaunchSpeed * trajectory;
 
 	}
 

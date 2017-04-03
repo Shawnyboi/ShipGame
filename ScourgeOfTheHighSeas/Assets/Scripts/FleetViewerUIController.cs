@@ -63,8 +63,16 @@ public class FleetViewerUIController : MonoBehaviour {
 			
 			if (GUI.Button (OffsetRect(m_UpgradeButtonRect, m_UpgradeButtonOffset * i), m_ShipUpgradesList[i].name)) {
 				
-				m_FleetViewerController.ApplyUpgradeToCurrentShip (m_ShipUpgradesList [i]);
-				m_ShipUpgradesList.RemoveAt (i);
+				if (m_FleetViewerController.ApplyUpgradeToCurrentShip (m_ShipUpgradesList [i])) {
+					
+					m_ShipUpgradesList.RemoveAt (i);
+
+				} else {
+
+
+
+				}
+
 				m_CurrentShipStats = m_FleetViewerController.GetCurrentShipAttributes ();
 				m_CurrentShipStatsString = ShipAttributesDataToString (m_CurrentShipStats);
 				break;

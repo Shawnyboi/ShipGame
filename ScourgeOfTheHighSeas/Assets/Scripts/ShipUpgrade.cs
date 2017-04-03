@@ -46,16 +46,30 @@ public class ShipUpgrade {
 	/// <summary>
 	/// This function takes in the "ship" from the plaer data controller and augments it. 
 	/// This is the main purpose of the ShipUpgradeClass
+	/// It checks if the upgrade has been applied, if it has, do nothing and return false
 	/// </summary>
 	/// <param name="shipAttributesData">Ship attributes data.</param>
-	public void AugmentShip(ShipAttributesData shipAttributesData){
-		shipAttributesData.speed += m_SpeedAugment;
-		shipAttributesData.damage += m_DamageAugment;
-		shipAttributesData.maxHullStrength += m_MaxHullStrengthAugment;
-		shipAttributesData.reloadTime += m_ReloadTimeAugment;
-		shipAttributesData.range += m_RangeAugment;
-		if (m_MaxHullStrengthAugment > 0f) {
-			shipAttributesData.currentHullStrength = shipAttributesData.maxHullStrength;
+	public bool AugmentShip(ShipAttributesData shipAttributesData){
+		
+		if (!shipAttributesData.upgradeList.Contains (m_UpgradeName)) {
+			
+			shipAttributesData.speed += m_SpeedAugment;
+			shipAttributesData.damage += m_DamageAugment;
+			shipAttributesData.maxHullStrength += m_MaxHullStrengthAugment;
+			shipAttributesData.reloadTime += m_ReloadTimeAugment;
+			shipAttributesData.range += m_RangeAugment;
+			shipAttributesData.upgradeList.Add (m_UpgradeName);
+
+			if (m_MaxHullStrengthAugment > 0f) {
+				
+				shipAttributesData.currentHullStrength = shipAttributesData.maxHullStrength;
+
+			}
+
+			return true;
+
+		} else {
+			return false;
 		}
 
 	}
