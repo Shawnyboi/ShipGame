@@ -9,6 +9,35 @@ public class LocationMarkerController : MonoBehaviour {
 
 	public int m_LocationIndex;
 
+	public Canvas m_NameCanvas;
+	public RectTransform m_NameRectTransform;
+	public Vector3 m_NameVerticalDisplacement;
+
+	private Transform m_Transform;
+
+
+	private void Awake(){
+
+		m_Transform = gameObject.transform;
+		m_NameCanvas.worldCamera = Camera.main;
+		m_NameCanvas.enabled = false;
+
+	}
+
+
+	private void Update(){
+
+		m_NameCanvas.enabled = false;
+
+	}
+	private void FixedUpdate(){
+
+		m_NameRectTransform.position = m_Transform.position + m_NameVerticalDisplacement;
+
+	}
+
+
+
 	/// <summary>
 	/// Gets the index of the location.
 	/// </summary>
@@ -21,8 +50,8 @@ public class LocationMarkerController : MonoBehaviour {
 	/// Makes the location marker change color and display its name
 	/// </summary>
 	public void Highlight(){
-		
-		//Debug.Log ("Highlighting location marker " + m_LocationIndex);
+
+		m_NameCanvas.enabled = true;
 
 	}
 

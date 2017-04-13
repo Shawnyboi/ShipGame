@@ -23,6 +23,7 @@ public class OverworldDataController : MonoBehaviour {
 	private static string m_EnemyShipFolderName = "EnemyShips";
 
 	private static int m_NothingEventIndex = 1;
+	private static int m_StartingLocationIndex = 0;
 
 	private int m_PlayerLocation;
 
@@ -94,7 +95,7 @@ public class OverworldDataController : MonoBehaviour {
 	/// <param name="saveIndex"> the index where the save file is held</param>
 	public void InitializeOverworldDataController(bool newGame = true, int saveIndex = 0){
 		if (newGame) {
-			m_PlayerLocation = 0; 
+			m_PlayerLocation = m_StartingLocationIndex; 
 			m_PastEvents = new List<int> ();
 		}
 	}
@@ -202,7 +203,14 @@ public class OverworldDataController : MonoBehaviour {
 	/// <param name="currentLocationIndex">Current location index.</param>
 	/// <param name="desiredLocationIndex">Desired location index.</param>
 	public bool CheckIfLocationConnected(int currentLocationIndex,int desiredLocationIndex){
+
+		Debug.Log ("current location index is " + currentLocationIndex);
+		Debug.Log ("desired location index is " + desiredLocationIndex);
+		Debug.Log ("Checking if locations are connected");
+
+		Debug.Log("Connections for currentLocationIndex are:");
 		foreach(int connection in m_LocationDataList[currentLocationIndex].m_LocationConnections){
+			Debug.Log (connection);
 			if (connection == desiredLocationIndex) {
 				return true;
 			}

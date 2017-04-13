@@ -28,10 +28,6 @@ public class ShipMovementController : MonoBehaviour {
 	//this 
 	private List<Vector3> m_SubWaypointList;
 
-	//these variables pertain to the stun blocking function
-	private float m_StunBlockTime;
-	private bool m_IsStunBlocked;
-
 	//this is a flag to prevent the turning coroutine from stacking
 	private bool m_IsTurning;
 
@@ -47,7 +43,6 @@ public class ShipMovementController : MonoBehaviour {
 		m_CurrentDestination = m_Transform.position;
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
-		m_IsStunBlocked = false;
 		m_Waypoint = Object.Instantiate (m_Waypoint);
 		m_Waypoint.SetActive (false);
 		m_IsTurning = false;
@@ -58,18 +53,15 @@ public class ShipMovementController : MonoBehaviour {
 	void Start(){
 		m_ShipSpeed = m_ShipAttributes.m_Speed;
 		m_ShipTurningSpeed = m_ShipAttributes.m_TurningSpeed;
-		m_StunBlockTime = m_ShipAttributes.m_StunBlockTime;
 
 	}
 
 	//Used for physical calculations
 	void FixedUpdate () {
 
-		if (!m_IsStunBlocked) {
-			if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5f) { //if not at destination (5 is a magic number)
-				Move ();
+		if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5f) { //if not at destination (5 is a magic number)
+			Move ();
 
-			}
 		}
 	}
 
@@ -161,22 +153,6 @@ public class ShipMovementController : MonoBehaviour {
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
 	}
-
-	/*
-	//For when the ship bumps into another ship it will become stun blocked and not be able to move for some time
-	public IEnumerator StunBlock(Collider blockerCollider){
-
-		if (blockerCollider == this.gameObject.GetComponent<ShipColliderController> ().m_TriggerCollider) {
-			m_IsStunBlocked = true;
-			this.gameObject.GetComponent<ShipStatusController> ().SetStunBlockStatus (true);
-			m_CurrentDestination = m_Transform.position;		
-			yield return new WaitForSeconds (m_StunBlockTime);
-			m_IsStunBlocked = false;
-			this.gameObject.GetComponent<ShipStatusController> ().SetStunBlockStatus (false);
-
-		}
-	}
-	*/
 
 	/// <summary>
 	/// This coroutine will handle the turning concurrently to the movement in order to make it look smoother

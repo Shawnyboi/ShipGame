@@ -101,11 +101,13 @@ public class OverworldController : MonoBehaviour {
 			//move if posiible
 			//trigger event;
 			if (m_OverworldDataController.CheckIfLocationConnected (m_CurrentLocation.GetComponent<LocationMarkerController> ().m_LocationIndex, locationIndex)) {
-				
+				Debug.Log ("moving to location index " + locationIndex);
 				SetCurrentLocation (locationIndex);
 				UpdatePlayerAvatarLocation ();
-				m_EventController.StartEventDialogue(m_OverworldDataController.GetRandomEventIndexAtLocation (locationIndex));
+				m_EventController.StartEventDialogue (m_OverworldDataController.GetRandomEventIndexAtLocation (locationIndex));
 			
+			} else {
+				Debug.Log ("location index " + locationIndex + " is not connected to this location");
 			}
 		}
 	}

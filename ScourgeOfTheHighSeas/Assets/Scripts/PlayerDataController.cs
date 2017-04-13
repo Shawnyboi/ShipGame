@@ -204,7 +204,6 @@ public class ShipAttributesData{
 
 	public float speed;
 	public float turningSpeed;
-	public float stunBlockTime;
 	public float maxHullStrength;
 	public float currentHullStrength;
 	public float range;

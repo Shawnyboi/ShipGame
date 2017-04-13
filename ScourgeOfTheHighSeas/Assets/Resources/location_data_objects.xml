@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Locations>
-	<Location name="America">
+	<Location name="Havana">
 		<Location_Index>0</Location_Index>
 		<Location_Connections>
-			<Location_Connection>1</Location_Connection>
+			<Location_Connection>7</Location_Connection>
+			<Location_Connection>5</Location_Connection>
+			<Location_Connection>19</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Gibraltar">
+		<Location_Index>1</Location_Index>
+		<Location_Connections>
+			<Location_Connection>19</Location_Connection>
+			<Location_Connection>14</Location_Connection>
+			<Location_Connection>6</Location_Connection>
 			<Location_Connection>2</Location_Connection>
 		</Location_Connections>
 		<Events>
@@ -17,28 +37,13 @@
 			</Event>
 		</Events>
 	</Location>
-	<Location name="Europe">
-		<Location_Index>1</Location_Index>
-		<Location_Connections>
-			<Location_Connection>0</Location_Connection>
-			<Location_Connection>3</Location_Connection>
-		</Location_Connections>
-		<Events>
-			<Event unique="False">
-				<EventIndex>1</EventIndex>
-				<EventProbability>.8</EventProbability>
-			</Event>
-			<Event unique="False">
-				<EventIndex>2</EventIndex>
-				<EventProbability>.2</EventProbability>
-			</Event>
-		</Events>
-	</Location>
-	<Location name="South America">
+	<Location name="Rio">
 		<Location_Index>2</Location_Index>
 		<Location_Connections>
+			<Location_Connection>6</Location_Connection>
+			<Location_Connection>1</Location_Connection>
+			<Location_Connection>9</Location_Connection>
 			<Location_Connection>3</Location_Connection>
-			<Location_Connection>0</Location_Connection>
 		</Location_Connections>
 		<Events>
 			<Event unique="True">
@@ -47,19 +52,400 @@
 			</Event>
 			<Event unique="False">
 				<EventIndex>1</EventIndex>
-				<EventProbability>.4</EventProbability>
+				<EventProbability>.1</EventProbability>
 			</Event>
 			<Event unique="False">
 				<EventIndex>2</EventIndex>
-				<EventProbability>.1</EventProbability>
+				<EventProbability>.4</EventProbability>
 			</Event>
 		</Events>
 	</Location>
-	<Location name="Africa">
+	<Location name="Lagos">
 		<Location_Index>3</Location_Index>
 		<Location_Connections>
+			<Location_Connection>2</Location_Connection>
+			<Location_Connection>11</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Jeddah">
+		<Location_Index>4</Location_Index>
+		<Location_Connections>
+			<Location_Connection>12</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Tortuga">
+		<Location_Index>5</Location_Index>
+		<Location_Connections>
+			<Location_Connection>6</Location_Connection>
+			<Location_Connection>0</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Georgetown">
+		<Location_Index>6</Location_Index>
+		<Location_Connections>
+			<Location_Connection>5</Location_Connection>
 			<Location_Connection>1</Location_Connection>
 			<Location_Connection>2</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="New York">
+		<Location_Index>7</Location_Index>
+		<Location_Connections>
+			<Location_Connection>8</Location_Connection>
+			<Location_Connection>0</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Nova Scotia">
+		<Location_Index>8</Location_Index>
+		<Location_Connections>
+			<Location_Connection>23</Location_Connection>
+			<Location_Connection>7</Location_Connection>
+			<Location_Connection>19</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Punta Arenas">
+		<Location_Index>9</Location_Index>
+		<Location_Connections>
+			<Location_Connection>2</Location_Connection>
+			<Location_Connection>10</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Panama">
+		<Location_Index>10</Location_Index>
+		<Location_Connections>
+			<Location_Connection>9</Location_Connection>
+			<Location_Connection>21</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Cape Town">
+		<Location_Index>11</Location_Index>
+		<Location_Connections>
+			<Location_Connection>3</Location_Connection>
+			<Location_Connection>12</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Mogadishu">
+		<Location_Index>12</Location_Index>
+		<Location_Connections>
+			<Location_Connection>4</Location_Connection>
+			<Location_Connection>16</Location_Connection>
+			<Location_Connection>11</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Alexandria">
+		<Location_Index>13</Location_Index>
+		<Location_Connections>
+			<Location_Connection>14</Location_Connection>
+			<Location_Connection>15</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Malta">
+		<Location_Index>14</Location_Index>
+		<Location_Connections>
+			<Location_Connection>13</Location_Connection>
+			<Location_Connection>15</Location_Connection>
+			<Location_Connection>1</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Istanbul">
+		<Location_Index>15</Location_Index>
+		<Location_Connections>
+			<Location_Connection>13</Location_Connection>
+			<Location_Connection>14</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Mumbai">
+		<Location_Index>16</Location_Index>
+		<Location_Connections>
+			<Location_Connection>12</Location_Connection>
+			<Location_Connection>17</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Singapore">
+		<Location_Index>17</Location_Index>
+		<Location_Connections>
+			<Location_Connection>16</Location_Connection>
+			<Location_Connection>25</Location_Connection>
+			<Location_Connection>18</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Hong Kong">
+		<Location_Index>18</Location_Index>
+		<Location_Connections>
+			<Location_Connection>17</Location_Connection>
+			<Location_Connection>20</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="London">
+		<Location_Index>19</Location_Index>
+		<Location_Connections>
+			<Location_Connection>8</Location_Connection>
+			<Location_Connection>1</Location_Connection>
+			<Location_Connection>0</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Shanghai">
+		<Location_Index>20</Location_Index>
+		<Location_Connections>
+			<Location_Connection>24</Location_Connection>
+			<Location_Connection>22</Location_Connection>
+			<Location_Connection>21</Location_Connection>
+			<Location_Connection>18</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="San Diego">
+		<Location_Index>21</Location_Index>
+		<Location_Connections>
+			<Location_Connection>10</Location_Connection>
+			<Location_Connection>20</Location_Connection>
+			<Location_Connection>22</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Edo">
+		<Location_Index>22</Location_Index>
+		<Location_Connections>
+			<Location_Connection>24</Location_Connection>
+			<Location_Connection>20</Location_Connection>
+			<Location_Connection>21</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="The Far North">
+		<Location_Index>23</Location_Index>
+		<Location_Connections>
+			<Location_Connection>8</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="Hanseong">
+		<Location_Index>24</Location_Index>
+		<Location_Connections>
+			<Location_Connection>22</Location_Connection>
+			<Location_Connection>20</Location_Connection>
+		</Location_Connections>
+		<Events>
+			<Event unique="False">
+				<EventIndex>1</EventIndex>
+				<EventProbability>.8</EventProbability>
+			</Event>
+			<Event unique="False">
+				<EventIndex>2</EventIndex>
+				<EventProbability>.2</EventProbability>
+			</Event>
+		</Events>
+	</Location>
+	<Location name="New South Wales">
+		<Location_Index>25</Location_Index>
+		<Location_Connections>
+			<Location_Connection>17</Location_Connection>
 		</Location_Connections>
 		<Events>
 			<Event unique="False">

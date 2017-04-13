@@ -12,7 +12,7 @@ public class CameraController : MonoBehaviour {
 	void Awake(){
 		m_MainCameraTransform = m_MainCamera.gameObject.GetComponent<Transform> ();
 	}
-
+	 
 
 
 	void FixedUpdate () {
@@ -50,17 +50,4 @@ public class CameraController : MonoBehaviour {
 		return rotatedInput * m_CameraSpeed * Time.unscaledDeltaTime; //then we multiply by the camera's scroll speed
 
 	}
-
-	/// <summary>
-	/// This function compensates for virtual pause by mulitplying camera speed by the inverse of the virtual pause time scale factor. It is intended to be called by the player object
-	/// IT CURRENTLY DOESNT WORK
-	/// </summary>
-	/// <param name="timeScaleFactor">the factor with which you intend to multiply the cameraspeed.</param>
-	//public void CompensateForVirtualPause(float timeScaleFactor){
-	//	m_CameraSpeed *= timeScaleFactor;
-	//	Debug.Log ("New Camera Speed " + m_CameraSpeed);
-	//}
-
-
-
 }

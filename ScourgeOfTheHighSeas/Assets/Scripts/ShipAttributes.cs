@@ -8,7 +8,6 @@ public class ShipAttributes : MonoBehaviour {
 
 	public float m_Speed;
 	public float m_TurningSpeed;
-	public float m_StunBlockTime;
 	public float m_MaxHullStrength;
 	public float m_CurrentHullStrength;
 	public float m_Range;
@@ -31,7 +30,6 @@ public class ShipAttributes : MonoBehaviour {
 
 		data.speed = m_Speed;
 		data.turningSpeed = m_TurningSpeed;
-		data.stunBlockTime = m_StunBlockTime;
 		data.maxHullStrength = m_MaxHullStrength;
 		data.currentHullStrength = m_CurrentHullStrength;
 		data.range = m_Range;
@@ -54,7 +52,6 @@ public class ShipAttributes : MonoBehaviour {
 		
 		m_Speed = data.speed;
 		m_TurningSpeed = data.turningSpeed;
-		m_StunBlockTime = data.stunBlockTime;
 		m_MaxHullStrength = data.maxHullStrength;
 		m_CurrentHullStrength = data.currentHullStrength;
 		m_Range = data.range;

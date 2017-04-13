@@ -4,11 +4,12 @@ using UnityEngine.UI;
 
 //this class deals with information pertaining to the status of the ship
 public class ShipStatusController : MonoBehaviour {
+
+	private Transform m_Transform;
+
 	//these variables have to do with displaying ship status
 	public Canvas m_LifebarCanvas;
 	public Slider m_Lifebar;
-	public Canvas m_BlockedCanvas;
-	public Text m_BlockedLabel;
 	public Vector3 m_VerticalHealthBarDisplacement;
 	public Vector3 m_VerticalLabelDisplacement;
 
@@ -16,7 +17,6 @@ public class ShipStatusController : MonoBehaviour {
 	private float m_MaxHullStrength;
 	private float m_CurrentHullStrength;
 	private RectTransform m_LifebarTransform;
-	private RectTransform m_BlockedLabelTransform;
 
 	private ShipColliderController m_ShipColliderController;
 	private bool m_ShipBurning;
@@ -39,16 +39,14 @@ public class ShipStatusController : MonoBehaviour {
 
 
 	void Awake(){
-		
+
+		m_Transform = gameObject.transform;
 		m_LifebarCanvas.worldCamera = Camera.main;
-		m_BlockedCanvas.worldCamera = Camera.main;
 
 		m_ShipColliderController = gameObject.GetComponent<ShipColliderController> ();
 		m_ShipAttributes = gameObject.GetComponent<ShipAttributes> ();
 		m_LifebarTransform = m_Lifebar.GetComponent<RectTransform> ();
-
-		m_BlockedCanvas.enabled = false;
-		m_BlockedLabelTransform = m_BlockedLabel.GetComponent<RectTransform> ();
+			
 
 		m_DeathSound.enabled = true;
 		m_IsDying = false;
@@ -75,18 +73,11 @@ public class ShipStatusController : MonoBehaviour {
 
 	void FixedUpdate(){
 		
-		m_LifebarTransform.position = gameObject.transform.position + m_VerticalHealthBarDisplacement; //We have to continously move the health bar and status label above the object
-		m_BlockedLabelTransform.position = gameObject.transform.position + m_VerticalLabelDisplacement;
+		m_LifebarTransform.position = m_Transform.position + m_VerticalHealthBarDisplacement; //We have to continously move the health bar and status label above the object
 
 
 	}
 
-	//Call this when the ship gets stun blocked or un stun blocked in order to display that fact on the status
-	public void SetStunBlockStatus(bool status){
-		
-		m_BlockedCanvas.enabled = status;
-
-	}
 
 	//Do damage to the ship's hullstrength by the amount given as a parameter
 	//If ship dies then destroy ship and play death aniimation

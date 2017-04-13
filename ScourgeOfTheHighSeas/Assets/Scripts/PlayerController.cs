@@ -34,14 +34,14 @@ public class PlayerController : MonoBehaviour {
 
 
 
+
 	private void Awake(){
 		m_VirtualPauseTimeScaleFactor = .0001f;
 		m_PlayerCamera = Camera.main;
 		m_TeamLayerMask = 1 << LayerMask.NameToLayer ("PlayerShips");
 		m_SelectionBoxOn = false;
 		m_SelectionBoxCanvas.enabled = false;
-		//m_ShipSeparation = 10f;
-	}
+ 	}
 
 	// Use this for initialization
 	void Start () {
@@ -50,10 +50,18 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		
 		if(Input.GetMouseButton(0)){
+			
+			if (Input.GetKey ("left shift")) {//holding shift doesn't deselect ships
+				
+				StartCoroutine (SelectionBox (true));
 
-			StartCoroutine (SelectionBox ());
+			} else {
+				
+				StartCoroutine (SelectionBox (false));
+
+			}
 		
 		} else if (Input.GetMouseButtonUp (0)) {
 			
@@ -162,14 +170,24 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				
-				DeselectAllObjects ();
+				if (!shiftSelect) {
+					
+					DeselectAllObjects ();
+
+				}
+
 				return false;//object hit with raycast but not a ship that belongs to the player
 
 			}
 
 		} else {
 			
-			DeselectAllObjects ();
+			if (!shiftSelect) {
+				
+				DeselectAllObjects ();
+
+			} 
+
 			return false;//hit nothing with raycast
 
 		}
@@ -181,28 +199,55 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	/// <param name="originalMousePosition">Original mouse position in world space.</param>
 	/// <param name="finalMousePosition">Final mouse position in world space.</param>
-	private void BoxSelect(Vector3 originalMousePosition, Vector3 finalMousePosition){
+	private void BoxSelect(Vector3 originalMousePosition, Vector3 finalMousePosition, bool shiftClick){
+		
 		Collider[] hitShipColliders;
 		Vector3 boxCenter = (finalMousePosition + originalMousePosition) / 2f; //the avg of the two mouse points
-		//boxCenter.z = 0; // the z coord must be where the camera is
 
 		/*the overlap box extents are basically the width and height of the moused box and then extended as far as the camera in the z direction*/
 		Vector3 overlapBoxExtents = new Vector3 (Mathf.Abs ((finalMousePosition.x - originalMousePosition.x) ), Mathf.Abs ((finalMousePosition.y - originalMousePosition.y)), Camera.main.farClipPlane);
 
 
 		hitShipColliders = Physics.OverlapBox (boxCenter, overlapBoxExtents, Camera.main.transform.rotation, m_TeamLayerMask);
+
 		//GameObject cube = Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),boxCenter, Camera.main.transform.rotation) as GameObject;
 		//cube.transform.localScale = overlapBoxExtents;
+		if (!shiftClick) {
+			
+			DeselectAllObjects ();
 
-		DeselectAllObjects ();
-		for (int i = 0; i < hitShipColliders.Length; i++){
-			if (!hitShipColliders [i].isTrigger) { //each ship has two colliders, we want the non trigger one so as to not count each ship twice
+		}
+		for (int i = 0; i < hitShipColliders.Length; i++){//NESTED LOOP CONSIDER OPTIMIZING
+			
+			if (IsNotInArray(m_SelectedObjectArray,hitShipColliders [i].gameObject)) { 
+				
 				m_SelectedObjectArray [m_NumSelectedObjects] = hitShipColliders [i].gameObject;
 				m_SelectedObjectArray [m_NumSelectedObjects].GetComponent<ShipMovementController> ().Select ();
 				m_NumSelectedObjects += 1;
+
 			}
 				
 		}		
+	}
+
+	/// <summary>
+	/// This function takes a game object and an array of game objects and determines if the object exists in the array
+	/// </summary>
+	/// <returns><c>true</c> if this instance is not in array the specified array item; otherwise, <c>false</c>.</returns>
+	private bool IsNotInArray(GameObject[] array, GameObject item){
+		int itemID = item.GetInstanceID ();
+		int comparisonID;
+		for (int i = 0; i < array.Length; i++) {
+			if (array [i] != null) {
+				comparisonID = array [i].GetInstanceID ();
+				if (comparisonID == itemID) {
+					Debug.Log (item.name + " is in selected objects");
+					return false;
+				}
+			}
+		}
+		Debug.Log (item.name + " is not in selected objects");
+		return true;
 	}
 
 
@@ -453,7 +498,7 @@ public class PlayerController : MonoBehaviour {
 	/// This coroutine will serve to create the selection box and call the function that does the selection with the right values
 	/// It keeps track of where the mouse was when you started holding and where it was when you let go
 	/// </summary>
-	private IEnumerator SelectionBox(){
+	private IEnumerator SelectionBox(bool shiftClick){
 
 		if (!m_SelectionBoxOn) {
 
@@ -493,8 +538,8 @@ public class PlayerController : MonoBehaviour {
 				yield return null;
 
 			}
-
-			BoxSelect (originalMousePosition, currentMousePosition);//call box select when we stopp holding mouse
+			Debug.Log ("Calling box select with shift click = " + shiftClick);
+			BoxSelect (originalMousePosition, currentMousePosition, shiftClick);//call box select when we stopp holding mouse
 			m_SelectionBoxCanvas.enabled = false;
 			m_SelectionBoxOn = false; //Set the running flag of before exitting
 			yield return null;
