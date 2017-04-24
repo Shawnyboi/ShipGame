@@ -83,7 +83,15 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				
-				GiveMoveCommand ();
+				if (Input.GetKey ("left shift")) {
+					
+					GiveMoveCommand (true);
+
+				} else {
+
+					GiveMoveCommand (false);
+
+				}
 
 			}
 		}
@@ -241,12 +249,10 @@ public class PlayerController : MonoBehaviour {
 			if (array [i] != null) {
 				comparisonID = array [i].GetInstanceID ();
 				if (comparisonID == itemID) {
-					Debug.Log (item.name + " is in selected objects");
 					return false;
 				}
 			}
 		}
-		Debug.Log (item.name + " is not in selected objects");
 		return true;
 	}
 
@@ -376,7 +382,7 @@ public class PlayerController : MonoBehaviour {
 	/// Send out ray and see if it collides with the field Set the x,z point of collision as the destination of the selected object
 	/// </summary>
 	/// <returns><c>true</c>, if move command was given, <c>false</c> otherwise.</returns>
-	private bool GiveMoveCommand(){
+	private bool GiveMoveCommand(bool shiftClick = false){
 
 		Ray rayToField = m_PlayerCamera.ScreenPointToRay (Input.mousePosition);
 		RaycastHit hitField;
@@ -392,7 +398,8 @@ public class PlayerController : MonoBehaviour {
 						ShipMovementController ship = m_SelectedObjectArray[i].GetComponent<ShipMovementController> ();
 
 						if (ship) {	
-							ship.SetDestination(DetermineFormationDestination(hitField.point, i));//if we clicked on the field and we have a ship selected, we tell that ship to go to the destination based on the formation
+							Debug.Log ("Giving move command");
+							ship.SetDestination(DetermineFormationDestination(hitField.point, i), shiftClick);//if we clicked on the field and we have a ship selected, we tell that ship to go to the destination based on the formation
 							ship.GetComponent<ShipMovementController> ().SetCommandedDestinationFlag (true); //we let it know it has got a direct move command
 						}
 					}
@@ -460,7 +467,6 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	/// <param name="pausing">If set to <c>true</c> pause.</param>
 	public void VirtualPause(){
-		Debug.Log ("Calling virtual pause in player controller");
 		if (m_VirtuallyPaused == false) {
 			
 			m_VirtuallyPaused = true;
@@ -538,7 +544,6 @@ public class PlayerController : MonoBehaviour {
 				yield return null;
 
 			}
-			Debug.Log ("Calling box select with shift click = " + shiftClick);
 			BoxSelect (originalMousePosition, currentMousePosition, shiftClick);//call box select when we stopp holding mouse
 			m_SelectionBoxCanvas.enabled = false;
 			m_SelectionBoxOn = false; //Set the running flag of before exitting

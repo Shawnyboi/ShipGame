@@ -10,6 +10,7 @@ public class ShipMovementController : MonoBehaviour {
 	public ShipFireController m_ShipFireController;
 	private bool m_CurrentlyTrackingTarget;
 	private bool m_HaveCommandedDestination;
+	private bool m_RenderingWaypoint;
 
 	private ShipAttributes m_ShipAttributes;
 
@@ -25,7 +26,7 @@ public class ShipMovementController : MonoBehaviour {
 	public GameObject m_Waypoint;
 	public bool m_IsSelected;
 
-	//this 
+	//this is a list containing several waypoints to be traversed in order
 	private List<Vector3> m_SubWaypointList;
 
 	//this is a flag to prevent the turning coroutine from stacking
@@ -47,6 +48,8 @@ public class ShipMovementController : MonoBehaviour {
 		m_Waypoint.SetActive (false);
 		m_IsTurning = false;
 		m_CurrentlyTrackingTarget = false;
+		m_RenderingWaypoint = false;
+		m_SubWaypointList = new List<Vector3> ();
 
 	}
 
@@ -57,40 +60,49 @@ public class ShipMovementController : MonoBehaviour {
 	}
 
 	//Used for physical calculations
-	void FixedUpdate () {
+	void FixedUpdate () {			
+	
+		Move ();
 
-		if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5f) { //if not at destination (5 is a magic number)
-			Move ();
-
-		}
 	}
 
 	//Move toward current destination at the speed of the ship
 	//Then check if you are close enough to the destination, if so set given destination flag to false
 	//Can only move if turned in the right direction
 	private void Move () {
-		m_Rigidbody.MovePosition(m_Transform.position + m_Transform.forward * m_ShipSpeed * Time.deltaTime);
-		if (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) <= 6f) {// 6f is a magic number to let us know we are there
-			SetCommandedDestinationFlag (false); //reached destination
+		
+		if (!AtDestination ()) {
+		
+			m_Rigidbody.MovePosition (m_Transform.position + m_Transform.forward * m_ShipSpeed * Time.deltaTime);
+		
+		} else {
+			
+			SetCommandedDestinationFlag (false);
+
 		}
+
+
 	}
 
 	//Turn the bow of the ship toward the destination
 	private void Turn () {	
+		
 		float angleToDest = Vector3.Angle (m_Transform.forward, m_CurrentDestination - m_Transform.position);
 		Vector3 crossProduct = Vector3.Cross (m_Transform.forward, m_CurrentDestination - m_Transform.position);
 		Quaternion deltaRotation;
+
 		if (crossProduct.y < 0f) {
+			
 			deltaRotation = Quaternion.Euler (0f, -Time.smoothDeltaTime * m_ShipTurningSpeed, 0f); //turn to port
 
 		} else {
+			
 			deltaRotation = Quaternion.Euler (0f, Time.smoothDeltaTime * m_ShipTurningSpeed, 0f); //turn to starboard
 
 		}
 
-
-
 		if (angleToDest > 10f) {//if not facing the right direction yet (10 is a magic number)
+			
 			m_Rigidbody.MoveRotation (m_Rigidbody.rotation * deltaRotation);
 
 		}
@@ -103,11 +115,15 @@ public class ShipMovementController : MonoBehaviour {
 	/// </summary>
 	/// <param name="desiredAngle">Desired angle.</param>
 	private void Turn(float desiredAngle){
+		
 		Quaternion deltaRotation;
+
 		if (desiredAngle < 0f) {
+			
 			deltaRotation = Quaternion.Euler (0f, -Time.smoothDeltaTime * m_ShipTurningSpeed, 0f); //turn to port
 
 		} else {
+			
 			deltaRotation = Quaternion.Euler (0f, Time.smoothDeltaTime * m_ShipTurningSpeed, 0f); //turn to starboard
 
 		}
@@ -117,16 +133,35 @@ public class ShipMovementController : MonoBehaviour {
 	}
 
 
-	//Set a new destination as this objects current destination
-	//also returns that point as a vector3
-	public Vector3 SetDestination(Vector3 newDest){
-		m_StandingGround = false;
-		m_CurrentDestination = newDest;
-		StartCoroutine (RenderWaypoint ());
-		if (!m_IsTurning) {
-			StartCoroutine (HandleTurning ());
+	/// <summary>
+	/// Set a new destination as this objects current destination or as next destination
+	/// </summary>
+	/// <param name="newDest">New destination.</param>
+	/// <param name="subWaypoint">If true we are adding a subwaypoint to list to be hit after first subwaypoint
+	public void SetDestination(Vector3 newDest, bool subWaypoint = false){
+
+		//if we are nut using the subwaypoint list just set new destination as current destination
+		if (!subWaypoint) {
+			
+			m_StandingGround = false;
+			m_SubWaypointList.Clear ();
+			m_SubWaypointList.Add (newDest);
+			m_CurrentDestination = newDest;
+			StartCoroutine (RenderWaypoint ());
+
+			if (!m_IsTurning) {
+				
+				StartCoroutine (HandleTurning ());
+
+			}
+
+		} else {
+			
+			//if we are setting the next destination don't change current destination
+			m_SubWaypointList.Add (newDest);
+			StartCoroutine (RenderWaypoint ());
+
 		}
-		return newDest;
 
 	}
 
@@ -150,19 +185,25 @@ public class ShipMovementController : MonoBehaviour {
 
 	//Do something when the ship is deselected by the player
 	public void Deselect(){
+		
 		m_SelectionCanvas.enabled = false;
 		m_IsSelected = false;
+
 	}
 
 	/// <summary>
 	/// This coroutine will handle the turning concurrently to the movement in order to make it look smoother
 	/// </summary>
 	private IEnumerator HandleTurning(){
-		while (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5) {
+		
+		while (!AtDestination()) {
+			
 			m_IsTurning = true;		
 			Turn ();
 			yield return null;
+
 		}
+
 		m_IsTurning = false;
 	}
 
@@ -170,11 +211,15 @@ public class ShipMovementController : MonoBehaviour {
 	/// This coroutine turns the fire positions of the ship toward the target
 	/// </summary>
 	private IEnumerator HandleAttackTurning(){
+		
 		while (Mathf.Abs(m_ShipFireController.GetAttackAngle ()) > 1f) {//while angle between target and attack position are not zero (The 1f is a magic number appromiately equal to zero)
+
 			m_IsTurning = true;
 			Turn (m_ShipFireController.GetAttackAngle ());
 			yield return null;
+
 		}
+
 		m_IsTurning = false;
 	}
 
@@ -183,16 +228,32 @@ public class ShipMovementController : MonoBehaviour {
 	/// This coroutine take care of displaying the waypoint at the correct position until the ship gets to it's position
 	/// </summary>
 	private IEnumerator RenderWaypoint (){
-		m_Waypoint.transform.position = m_CurrentDestination;
-		while (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) > 5) {
-			if (m_IsSelected) {
-				m_Waypoint.SetActive (true);
-			} else {
-				m_Waypoint.SetActive (false);
+		
+		m_Waypoint.transform.position = m_SubWaypointList [m_SubWaypointList.Count - 1];
+
+		if (!m_RenderingWaypoint) {
+			
+			m_RenderingWaypoint = true;
+
+			while (!AtDestination ()) {
+				
+				if (m_IsSelected) {
+					
+					m_Waypoint.SetActive (true);
+
+				} else {
+					
+					m_Waypoint.SetActive (false);
+
+				}
+
+				yield return null;
 			}
-			yield return null;
+
 		}
+
 		m_Waypoint.SetActive (false);
+		m_RenderingWaypoint = false;
 
 	}
 
@@ -212,6 +273,34 @@ public class ShipMovementController : MonoBehaviour {
 	/// <returns><c>true</c> if this instance has commanded destination; otherwise, <c>false</c>.</returns>
 	public bool HasCommandedDestination(){
 		return m_HaveCommandedDestination;
+	}
+
+
+	//Function checks if ship has reached (or is close enough to say we reached) the current destination.
+	private bool AtDestination(){
+
+		bool reachedCurrentDestination = (Vector3.Magnitude (m_CurrentDestination - m_Transform.position) < 5f);
+		if (!reachedCurrentDestination) {
+			
+			return false;//if we have not reached current destination return false
+		
+		} else {
+			
+
+			if (m_SubWaypointList.Count > 1) {
+				
+				m_SubWaypointList.RemoveAt (0);
+				m_CurrentDestination = m_SubWaypointList [0];
+				return false; //if we have reached current destination but there is still another destination return false and set current destination to next destination
+
+			} else {
+				
+				return true;//if we are at the only remaining destination return true
+
+			}
+
+		}
+
 	}
 
 	/// <summary>
